@@ -1076,6 +1076,20 @@ function isRailBikeReservation(entryName) {
   return isShengXing && isBike && hasReservation;
 }
 
+// 擷取預約字串中的時間（例如 "13:40已預約" -> 820 分鐘）
+function extractReservationTimeMinutes(entryName) {
+  if (!entryName) return null;
+  const match = entryName.match(/(\d{1,2})[:：](\d{2})/);
+  if (match) {
+    const hh = parseInt(match[1], 10);
+    const mm = parseInt(match[2], 10);
+    if (!isNaN(hh) && !isNaN(mm)) {
+      return hh * 60 + mm;
+    }
+  }
+  return null;
+}
+
 // 精選景點資料庫
 const travelLibrary = [
   {
@@ -2101,8 +2115,17 @@ function renderFullCustomerPage() {
         const card = document.createElement('div');
         card.className = 'p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFE9DD] space-y-2';
 
-        const stayMins = getSpotStayMinutes(entryName, libMatch);
-        const meetingClockMins = currentClockMins + stayMins;
+        const isRailBike = isRailBikeReservation(entryName);
+        let stayMins = getSpotStayMinutes(entryName, libMatch);
+        let meetingClockMins = currentClockMins + stayMins;
+
+        // 若為勝興車站鐵道自行車/腳踏火車預約，集合時間改為預約時間 + 90 分鐘
+        if (isRailBike) {
+          const bookedMins = extractReservationTimeMinutes(entryName);
+          if (bookedMins !== null) {
+            meetingClockMins = bookedMins + 90;
+          }
+        }
 
         const titleEl = document.createElement('h4');
         titleEl.className = 'text-sm font-bold font-serif text-[#1A1A18]';
@@ -2111,7 +2134,7 @@ function renderFullCustomerPage() {
         card.appendChild(titleEl);
 
         // 勝興車站鐵道自行車 / 腳踏火車安全講習紅字提醒警示框
-        if (isRailBikeReservation(entryName)) {
+        if (isRailBike) {
           const alertBox = document.createElement('div');
           alertBox.className = 'rounded-xl border border-rose-300 bg-rose-50/90 px-3 py-2 text-xs font-bold text-rose-700 flex items-center gap-2 shadow-2xs my-1';
           alertBox.innerHTML = `
