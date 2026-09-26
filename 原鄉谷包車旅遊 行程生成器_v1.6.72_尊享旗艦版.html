@@ -435,25 +435,6 @@ html[data-lang="en"] .font-serif-luxury {
   border-color: var(--gold-michelin);
   box-shadow: 0 8px 26px rgba(197, 160, 89, 0.14);
 }
-
-.footer-seal-box {
-  width: 48px;
-  height: 48px;
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: visible;
-  padding: 0 !important;
-  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  flex-shrink: 0;
-  position: relative;
-}
-.footer-signature-plate:hover .footer-seal-box {
-  transform: scale(1.06) rotate(-2deg);
-}
 </style>
 </head>
 
@@ -889,17 +870,9 @@ Day 2：台北君悅酒店 → 日月潭遊湖｜約 210 分鐘"></textarea>
 
 <!-- 頁尾 -->
 <footer class="footer-signature-plate p-4 sm:p-4.5 my-6 font-sans-ui flex items-center justify-between gap-3 sm:gap-4 relative overflow-hidden">
-  <div class="flex items-center gap-3.5 sm:gap-4 min-w-0">
-    <div class="relative shrink-0">
-      <div class="footer-seal-box">
-        <img id="footer-seal-img" src="https://raw.githubusercontent.com/tdb8053-bit/work/main/002.png" alt="原鄉谷包車旅遊 Logo" class="brand-seal-img" onload="onSealImageLoaded(this, 'footer-seal-fallback')" onerror="onSealImageError(this, 'footer-seal-fallback')">
-      </div>
-      <span class="absolute -bottom-1 -right-1 text-[8px] bg-[#8C6D37] text-white px-1.5 py-0.2 rounded-full font-cinzel font-bold tracking-tighter shadow-2xs border border-white/60">KEY</span>
-    </div>
-    <div class="min-w-0 space-y-0.5 text-left">
-      <span id="txt-footer-brand" class="font-bold text-xs sm:text-sm text-[#1A1A18] tracking-tight font-serif">原鄉谷包車旅遊 · The Michelin Key Voyage Edition</span>
-      <p id="txt-footer-contact" class="text-[10.5px] text-[#7A7468] truncate leading-relaxed">官方服務：原鄉谷包車旅遊</p>
-    </div>
+  <div class="min-w-0 space-y-0.5 text-left">
+    <span id="txt-footer-brand" class="font-bold text-xs sm:text-sm text-[#1A1A18] tracking-tight font-serif">原鄉谷包車旅遊 · The Michelin Key Voyage Edition</span>
+    <p id="txt-footer-contact" class="text-[10.5px] text-[#7A7468] truncate leading-relaxed">官方服務：原鄉谷包車旅遊</p>
   </div>
   <div class="hidden sm:flex flex-col items-end shrink-0 text-right pr-1">
     <span class="text-[9px] font-cinzel font-bold text-[#8C6D37] tracking-widest uppercase">Concierge Certified</span>
