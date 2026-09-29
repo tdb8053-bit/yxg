@@ -1,0 +1,3611 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>原鄉谷包車旅遊｜管理後台 v0.9.6</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Noto+Serif+TC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    :root {
+      --bg-alabaster: #F7F5F0;
+      --card-parchment: #FFFFFF;
+      --ink-black: #1A1A18;
+      --ink-sub: #5A5954;
+      --gold-michelin: #C5A059;
+      --gold-deep: #8C6D37;
+      --gold-light: #F4EEDF;
+      --border-gilded: #E7DFD0;
+      --burgundy-seal: #8C2425;
+      --sidebar-obsidian: #141412;
+      --sidebar-hover: #22221E;
+      --radius-card: 1.15rem;
+      --radius-control: 0.65rem;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--bg-alabaster);
+      color: var(--ink-black);
+      font-family: "Noto Serif TC", "Playfair Display", Georgia, serif;
+      line-height: 1.55;
+    }
+    button, input, select, textarea { font-family: inherit; }
+    button { cursor: pointer; }
+
+    .workspace-grid {
+      display: grid !important;
+      grid-template-columns: 16% 59% 25% !important;
+      min-height: 100vh;
+    }
+    .sidebar, .guide {
+      position: sticky !important;
+      top: 0 !important;
+      height: 100vh !important;
+      overflow-y: auto !important;
+    }
+
+    .sidebar {
+      padding: 24px 14px !important;
+      background: var(--sidebar-obsidian) !important;
+      color: #FAF5ED !important;
+      border-right: 1px solid rgba(197, 160, 89, 0.25);
+      box-shadow: 4px 0 25px rgba(0, 0, 0, 0.18);
+    }
+    .brand {
+      display: block !important;
+      padding: 4px 8px 24px !important;
+      border-bottom: 1px solid rgba(197, 160, 89, 0.2);
+      margin-bottom: 18px;
+    }
+    .brand-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+    .wax-seal-backend {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: transparent !important;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: visible;
+    }
+    .brand-seal-svg {
+      width: 100%;
+      height: 100%;
+      filter: drop-shadow(0 2px 4px rgba(140, 36, 37, 0.35));
+    }
+    .brand h1 {
+      font-size: 0.92rem;
+      margin: 0;
+      font-weight: 900;
+      color: #FAF5ED;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+    .brand p {
+      margin: 4px 0 0;
+      color: var(--gold-michelin) !important;
+      font-size: 0.68rem;
+      font-family: "Cinzel", "Plus Jakarta Sans", sans-serif;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+
+    .menu { display: grid !important; gap: 8px !important; }
+    .menu button {
+      width: 100% !important;
+      border: 1px solid transparent;
+      border-radius: var(--radius-control);
+      padding: 10px 10px;
+      text-align: left;
+      background: transparent;
+      color: #C8BFB0 !important;
+      font-size: 0.84rem;
+      transition: all .18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .menu button:hover {
+      background: var(--sidebar-hover) !important;
+      color: #FAF5ED !important;
+      border-color: rgba(197, 160, 89, 0.3);
+      transform: translateX(2px);
+    }
+    .menu button.active {
+      background: linear-gradient(135deg, #26241F 0%, #1A1A18 100%) !important;
+      color: #F7EAD0 !important;
+      font-weight: 800;
+      border-color: var(--gold-michelin) !important;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.35), inset 0 0 0 1px rgba(197, 160, 89, 0.4);
+    }
+    .menu-title { display: block; font-weight: 800; line-height: 1.25; }
+    .menu-note {
+      display: block;
+      margin-top: 3px;
+      color: #8C8476;
+      font-size: 0.68rem;
+      line-height: 1.35;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+    .menu button.active .menu-note { color: var(--gold-michelin); }
+
+    .center {
+      padding: 28px !important;
+      min-width: 0;
+      max-width: none !important;
+      margin: 0 !important;
+      overflow-y: auto;
+    }
+
+    .guide {
+      display: block !important;
+      padding: 24px 20px !important;
+      background: #FAF8F5 !important;
+      border-left: 1px solid var(--border-gilded) !important;
+      box-shadow: -4px 0 20px rgba(60, 52, 40, 0.03);
+    }
+    .guide-header {
+      border-bottom: 1.5px solid var(--border-gilded);
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+    }
+    .guide-header h2 {
+      font-size: 1rem;
+      margin: 0;
+      color: var(--gold-deep);
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .guide-header p {
+      margin: 5px 0 0;
+      font-size: 0.76rem;
+      color: var(--ink-sub);
+      font-family: "Plus Jakarta Sans", sans-serif;
+      line-height: 1.45;
+    }
+    .guide-step {
+      display: flex;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-gilded);
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+    .guide-step:last-child { border-bottom: none; }
+    .guide-step b {
+      display: grid;
+      flex: 0 0 24px;
+      height: 24px;
+      place-items: center;
+      border-radius: 50%;
+      background: var(--gold-light);
+      color: var(--gold-deep);
+      font-weight: 800;
+      font-size: 0.76rem;
+      font-family: "Cinzel", serif;
+      border: 1px solid #DFCFAE;
+      margin-top: 1px;
+    }
+    .guide-step-body strong {
+      color: var(--ink-black);
+      display: block;
+      margin-bottom: 2px;
+      font-size: 0.84rem;
+    }
+    .guide-step-body span {
+      color: var(--ink-sub);
+      font-size: 0.78rem;
+    }
+
+    .template-box {
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1.5px dashed var(--border-gilded);
+    }
+    .template-box-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--gold-deep);
+      margin: 0 0 10px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .template-btn-grid { display: flex; flex-direction: column; gap: 7px; }
+    .template-btn {
+      border: 1px solid var(--border-gilded);
+      border-radius: 9px;
+      padding: 8px 12px;
+      background: #FFFFFF;
+      color: var(--ink-black);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-align: left;
+      transition: all .16s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .template-btn:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-michelin);
+      color: var(--gold-deep);
+      transform: translateX(3px);
+    }
+    .template-btn span.badge {
+      font-size: 0.68rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: #EFE8DA;
+      color: var(--gold-deep);
+      border: 1px solid #DFCFAE;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    .card {
+      background: var(--card-parchment);
+      border: 1px solid var(--border-gilded);
+      border-radius: var(--radius-card);
+      padding: 22px;
+      box-shadow: 0 8px 24px rgba(60, 52, 40, 0.04);
+      margin-bottom: 18px;
+    }
+    .hero {
+      display: flex;
+      gap: 16px;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin: 0 0 18px;
+      border-bottom: 1px solid var(--border-gilded);
+      padding-bottom: 14px;
+    }
+    .eyebrow {
+      color: var(--gold-deep);
+      font-size: 0.74rem;
+      letter-spacing: 0.16em;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-family: "Cinzel", "Plus Jakarta Sans", sans-serif;
+    }
+    .hero h2 {
+      font-size: 1.45rem;
+      margin: 4px 0 0;
+      font-weight: 900;
+      color: var(--ink-black);
+      letter-spacing: -0.01em;
+    }
+    .hero p {
+      margin: 5px 0 0;
+      color: var(--ink-sub);
+      font-size: 0.84rem;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+
+    .button {
+      border: 1px solid var(--border-gilded);
+      border-radius: var(--radius-control);
+      padding: 8px 14px;
+      background: #FFFFFF;
+      color: var(--ink-black);
+      font-weight: 800;
+      font-size: 0.8rem;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      transition: all .16s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+    .button:hover {
+      background: var(--gold-light);
+      border-color: var(--gold-michelin);
+      color: var(--gold-deep);
+    }
+    .button.primary {
+      background: linear-gradient(135deg, #1A1A18 0%, #2A2823 100%);
+      border-color: var(--gold-michelin);
+      color: #FAF5ED;
+      box-shadow: 0 4px 12px rgba(26, 26, 24, 0.18);
+    }
+    .button.primary:hover {
+      background: linear-gradient(135deg, #8C6D37 0%, #73582A 100%);
+      border-color: #DFBE7A;
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+    .button.gold {
+      background: linear-gradient(135deg, #C5A059 0%, #8C6D37 100%);
+      border-color: #E6C887;
+      color: #FFFFFF;
+      box-shadow: 0 4px 12px rgba(197, 160, 89, 0.28);
+    }
+    .button.gold:hover {
+      background: linear-gradient(135deg, #DFBE7A 0%, #A88344 100%);
+      transform: translateY(-1px);
+    }
+    .button.danger {
+      background: #FFF5F5;
+      border-color: #FECDD3;
+      color: var(--burgundy-seal);
+    }
+    .button.danger:hover {
+      background: #FEE2E2;
+      border-color: #F87171;
+    }
+    .button.small {
+      padding: 5px 9px;
+      font-size: 0.74rem;
+      border-radius: 6px;
+    }
+
+    .panel { display: none; }
+    .panel.active { display: block; }
+    .empty {
+      padding: 26px;
+      border: 1.5px dashed var(--border-gilded);
+      border-radius: 12px;
+      color: var(--ink-sub);
+      font-size: 0.84rem;
+      text-align: center;
+      background: #FAF8F5;
+    }
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      max-width: min(360px, calc(100vw - 40px));
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: var(--ink-black);
+      border: 1px solid var(--gold-michelin);
+      color: #FAF5ED;
+      font-size: 0.8rem;
+      font-weight: 700;
+      font-family: "Plus Jakarta Sans", sans-serif;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      transform: translateY(160%);
+      transition: all .24s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 9999;
+    }
+    .toast.show { transform: translateY(0); }
+
+    .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+    .stat {
+      background: #FFFFFF;
+      border: 1px solid var(--border-gilded);
+      border-radius: var(--radius-card);
+      padding: 18px;
+      box-shadow: 0 6px 20px rgba(60, 52, 40, 0.03);
+    }
+    .stat span {
+      font-size: 0.76rem;
+      color: var(--ink-sub);
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-weight: 600;
+    }
+    .stat strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: var(--gold-deep);
+      font-family: "Plus Jakarta Sans", monospace;
+    }
+
+    .text-workspace {
+      width: 100%;
+      height: 270px;
+      min-height: 220px;
+      resize: vertical;
+      box-sizing: border-box;
+      border: 1px solid var(--border-gilded);
+      border-radius: 12px;
+      background: #FAF8F5;
+      color: var(--ink-black);
+      padding: 14px;
+      font: 13px/1.65 "Plus Jakarta Sans", ui-monospace, SFMono-Regular, Consolas, monospace;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.02);
+    }
+    .text-workspace:focus {
+      outline: none;
+      border-color: var(--gold-michelin);
+      background: #FFFFFF;
+    }
+
+    .preorder-item-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-gilded);
+      border-radius: 12px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.02);
+      transition: all .15s ease;
+    }
+    .preorder-item-card:hover { border-color: var(--gold-michelin); }
+    .preorder-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .preorder-grid label {
+      font-size: 0.72rem;
+      color: var(--ink-sub);
+      font-weight: 700;
+      display: block;
+      margin-bottom: 3px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+    .preorder-grid input, .preorder-grid select {
+      padding: 7px 9px;
+      border: 1px solid var(--border-gilded);
+      border-radius: 6px;
+      font-size: 0.82rem;
+      width: 100%;
+      background: #FAF8F5;
+      color: var(--ink-black);
+    }
+    .preorder-grid input:focus { outline: none; border-color: var(--gold-michelin); background: #fff; }
+    .subtotal-tag {
+      font-size: 0.82rem;
+      font-weight: 800;
+      color: var(--gold-deep);
+      text-align: right;
+      margin-top: 8px;
+      font-family: "Plus Jakarta Sans", monospace;
+    }
+
+    .place-accordion-card {
+      background: #FFFFFF;
+      border: 1px solid var(--border-gilded);
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all .16s ease;
+    }
+    .place-accordion-card:hover {
+      border-color: var(--gold-michelin);
+      box-shadow: 0 6px 18px rgba(197, 160, 89, 0.08);
+    }
+    .place-accordion-header {
+      padding: 14px 18px;
+      background: #FAF8F5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    .place-accordion-header h4 {
+      margin: 0;
+      font-size: 0.94rem;
+      font-weight: 800;
+      color: var(--ink-black);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .place-accordion-meta {
+      font-size: 0.76rem;
+      color: var(--ink-sub);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+    .place-accordion-content {
+      padding: 18px;
+      border-top: 1px solid var(--border-gilded);
+      background: #FFFFFF;
+      font-size: 0.83rem;
+      display: none;
+    }
+    .place-accordion-card.open .place-accordion-content { display: block; }
+    .place-accordion-card.open .toggle-icon { transform: rotate(180deg); }
+    .toggle-icon { transition: transform .2s ease; font-size: 0.8rem; color: var(--gold-deep); }
+
+    .edit-form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+    .edit-field { display: flex; flex-direction: column; gap: 4px; }
+    .edit-field label {
+      font-size: 0.76rem;
+      font-weight: 800;
+      color: var(--ink-black);
+      font-family: "Plus Jakarta Sans", sans-serif;
+    }
+    .edit-field input, .edit-field textarea, .edit-field select {
+      padding: 8px 10px;
+      border: 1px solid var(--border-gilded);
+      border-radius: 8px;
+      font-size: 0.82rem;
+      background: #FAF8F5;
+      color: var(--ink-black);
+    }
+    .edit-field input:focus, .edit-field textarea:focus {
+      outline: none;
+      border-color: var(--gold-michelin);
+      background: #FFFFFF;
+    }
+    .edit-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      align-items: center;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px dashed var(--border-gilded);
+    }
+
+    .statement-modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(26, 26, 24, 0.75);
+      backdrop-filter: blur(6px);
+      display: none;
+      place-items: center;
+      z-index: 2000;
+      padding: 16px;
+    }
+    .statement-modal-backdrop.active { display: grid; }
+    .statement-modal-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      max-width: 860px;
+      width: 100%;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.35);
+      overflow: hidden;
+      border: 1.5px solid var(--gold-michelin);
+    }
+    .statement-modal-header {
+      padding: 16px 22px;
+      background: var(--sidebar-obsidian);
+      color: #FAF5ED;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--gold-michelin);
+    }
+    .statement-modal-header h3 {
+      margin: 0;
+      font-size: 1rem;
+      font-weight: 800;
+      font-family: "Cinzel", "Noto Serif TC", serif;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold-michelin);
+    }
+    .statement-modal-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+      background: #FAF8F5;
+      font-size: 0.83rem;
+    }
+    .statement-modal-footer {
+      padding: 14px 22px;
+      background: #FFFFFF;
+      border-top: 1px solid var(--border-gilded);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    @media print {
+      @page { size: A4 portrait; margin: 10mm 12mm; }
+      body { background: #fff !important; color: #1A1A18 !important; }
+      .sidebar, .guide, .hero, .toast, .statement-modal-header, .statement-modal-footer, 
+      .edit-actions, nav, button, input, select { display: none !important; }
+      .workspace-grid { display: block !important; min-height: auto !important; }
+      .center { padding: 0 !important; margin: 0 !important; overflow: visible !important; }
+      .panel { display: none !important; }
+      .statement-modal-backdrop { position: static !important; display: block !important; background: transparent !important; padding: 0 !important; backdrop-filter: none !important; }
+      .statement-modal-card { max-width: 100% !important; max-height: none !important; border: none !important; box-shadow: none !important; overflow: visible !important; }
+      .statement-modal-body { padding: 0 !important; background: transparent !important; overflow: visible !important; }
+      #statement-printable-sheet { display: block !important; width: 100% !important; margin: 0 !important; padding: 0 !important; background: #fff !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="workspace-grid">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-title-wrap">
+          <div class="wax-seal-backend">
+            <svg viewBox="0 0 100 100" class="brand-seal-svg" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="46" fill="#8C2425" stroke="#C5A059" stroke-width="3"/>
+              <circle cx="50" cy="50" r="41" fill="none" stroke="#E6C887" stroke-width="1.5" stroke-dasharray="3 2"/>
+              <text x="50" y="58" font-family="'Noto Serif TC', serif" font-size="28" font-weight="900" fill="#FAF5ED" text-anchor="middle">原</text>
+              <text x="50" y="78" font-family="'Cinzel', serif" font-size="8" font-weight="700" fill="#E6C887" letter-spacing="2" text-anchor="middle">YXG</text>
+            </svg>
+          </div>
+          <div>
+            <h1>原鄉谷包車旅遊</h1>
+            <p>YuanXiangGu Travel Concierge</p>
+          </div>
+        </div>
+      </div>
+      <nav class="menu" aria-label="管理功能表">
+        <button id="create-confirmation" class="active" data-panel="confirmation">
+          <span class="menu-title">✦ 建立新行程</span>
+          <span class="menu-note">行程文字整理、完整度稽核與車程學習</span>
+        </button>
+        <button data-panel="overview">
+          <span class="menu-title">❖ 營運總覽</span>
+          <span class="menu-note">今日調度、監控與出車動態</span>
+        </button>
+        <button data-panel="orders">
+          <span class="menu-title">◈ 訂單／派遣</span>
+          <span class="menu-note">訂單案件庫、司導指派調度</span>
+        </button>
+        <button data-panel="finance">
+          <span class="menu-title">⚖ 帳務核算</span>
+          <span class="menu-note">車資拆帳、派遣費與定金沖銷</span>
+        </button>
+        <button data-panel="places">
+          <span class="menu-title">📍 景點資料庫</span>
+          <span class="menu-note">停留時間、導航座標與叮嚀</span>
+        </button>
+        <button data-panel="settings">
+          <span class="menu-title">⚙ 系統設定</span>
+          <span class="menu-note">生成器連線與匯款帳號維護</span>
+        </button>
+        <button data-panel="other">
+          <span class="menu-title">🌿 官網發布</span>
+          <span class="menu-note">公開行程官網內容即時發布</span>
+        </button>
+      </nav>
+    </aside>
+
+    <section class="center">
+      <!-- 1. 建立新行程面板 (預設啟用) -->
+      <section id="confirmation" class="panel active">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Smart Itinerary Intake & Learning</div>
+            <h2>行程文字整理、完整度稽核與車程資料庫</h2>
+            <p>貼入原始對話即時完成雙核校正，系統自動稽核缺漏（如住宿/餐食），並自動比對學習點對點行車時間。</p>
+          </div>
+        </div>
+
+        <!-- 頂部即時雙指標 Bar -->
+        <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap:12px; margin-bottom:16px;">
+          <div style="background:#FFFFFF; border:1.5px solid var(--gold-michelin); border-radius:12px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 14px rgba(197, 160, 89, 0.1);">
+            <div>
+              <span style="font-size:0.75rem; color:var(--ink-sub); font-weight:700;">📋 行程資料完整度稽核</span>
+              <div style="display:flex; align-items:baseline; gap:8px; margin-top:2px;">
+                <strong id="audit-score-stat" style="font-size:1.45rem; color:var(--gold-deep); font-family:'Plus Jakarta Sans', monospace;">85%</strong>
+                <span id="audit-badge" style="font-size:0.7rem; font-weight:800; background:var(--gold-light); color:var(--gold-deep); padding:2px 8px; border-radius:999px; border:1px solid #DFCFAE;">良好</span>
+              </div>
+            </div>
+            <div style="font-size:1.6rem;">🩺</div>
+          </div>
+
+          <div style="background:#FFFFFF; border:1.5px solid var(--gold-michelin); border-radius:12px; padding:14px 18px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 4px 14px rgba(197, 160, 89, 0.1);">
+            <div>
+              <span style="font-size:0.75rem; color:var(--ink-sub); font-weight:700;">🚗 點對點車程資料庫學習</span>
+              <div style="display:flex; align-items:baseline; gap:8px; margin-top:2px;">
+                <strong id="route-confirmed-stat" style="font-size:1.45rem; color:var(--gold-deep); font-family:'Plus Jakarta Sans', monospace;">0 / 0 段</strong>
+                <span id="route-coverage-badge" style="font-size:0.7rem; font-weight:800; background:#FAF5ED; color:var(--gold-deep); padding:2px 8px; border-radius:999px; border:1px solid #DFBE7A;">已確認</span>
+              </div>
+            </div>
+            <div style="font-size:1.6rem;">🗺️</div>
+          </div>
+        </div>
+
+        <!-- ✈️ 後台機場專屬迎賓接送機即時解析卡片 (自動辨識並帶出) -->
+        <div id="backend-flight-card" style="display:none; background:#FAF8F5; border:1.5px solid var(--gold-michelin); border-radius:12px; padding:14px 18px; margin-bottom:14px; box-shadow:0 4px 14px rgba(197, 160, 89, 0.08);">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-gilded); padding-bottom:8px; margin-bottom:10px;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:1.2rem;">✈️</span>
+              <h4 style="margin:0; font-size:0.92rem; font-weight:900; color:var(--gold-deep);">
+                機場專屬禮賓接送機資訊卡（系統已自動辨識帶出）
+              </h4>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="button small gold" onclick="window.syncFlightInfoToWorkspacePrompt()">✏️ 手動微調接送機</button>
+            </div>
+          </div>
+          <div id="backend-flight-details" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:10px; font-size:0.78rem; color:var(--ink-black);">
+          </div>
+        </div>
+
+        <article class="card" style="border: 1.5px solid var(--gold-michelin); background: #FAF8F5;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <h3 style="margin:0; color:var(--ink-black); font-size:1.05rem;">📝 行程文字工作區（可貼客人原始對話）</h3>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button class="button primary small" type="button" style="background: linear-gradient(135deg, #1A73E8 0%, #4285F4 100%); color:#fff; border-color:#8AB4F8;" onclick="window.convertRawTextToStandardWithGemini()">✨ 智慧一鍵轉標準格式 (雙核驅動)</button>
+              <button class="button small" type="button" title="更換或檢視 Google Gemini API Key" onclick="window.configureGeminiKeyPrompt()">🔑 設定 Gemini Key</button>
+              <button class="button danger small" type="button" onclick="window.clearWorkspaceInput()">🧹 清空</button>
+            </div>
+          </div>
+
+          <textarea id="standard-text-workspace" class="text-workspace" oninput="window.handleWorkspaceInputChanged()" placeholder="請貼上客人傳來的原始文字（例如：王小明 4人 10/15~10/19 桃園進台中出...），或直接輸入標準行程...">包車開始日期：2026/08/28
+包車結束日期：2026/09/02
+預約代表：貴賓 等共 4 人
+聯絡電話：
+
+接機資訊
+抵達日期：2026/08/28
+航班編號：TR867
+抵達時間：15:10
+抵達航廈：T1
+接機地點：桃園機場
+
+Day 1
+出發地點：桃園機場
+出發時間：接機日
+行程內容：
+桃園機場迎賓接駕
+住宿飯店：嘉義樂客商旅
+今日車資：4500
+
+Day 2
+出發地點：嘉義樂客商旅
+出發時間：09:00
+行程內容：
+阿里山國家森林遊樂區
+祝山觀日步道
+巨木群步道
+住宿飯店：嘉義樂客商旅
+今日車資：5500</textarea>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap:14px; margin-top:14px;">
+            <!-- 待補清單 -->
+            <div style="background:#FFFFFF; border:1px solid var(--border-gilded); border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--border-gilded); padding-bottom:6px;">
+                <h4 style="margin:0; font-size:0.92rem; color:var(--gold-deep); font-weight:900; display:flex; align-items:center; gap:6px;">
+                  <span>📋</span> 待補資料與完整度清單
+                </h4>
+                <span id="audit-summary-tag" style="font-size:0.72rem; color:var(--ink-sub); font-weight:700;">即時分析中</span>
+              </div>
+              <div id="audit-items-list" style="display:flex; flex-direction:column; gap:6px; font-size:0.8rem;"></div>
+            </div>
+
+            <!-- 車程資料庫與學習佇列 -->
+            <div style="background:#FFFFFF; border:1px solid var(--border-gilded); border-radius:12px; padding:16px; box-shadow:0 2px 8px rgba(0,0,0,0.02);">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; border-bottom:1px solid var(--border-gilded); padding-bottom:6px; flex-wrap:wrap; gap:6px;">
+                <h4 style="margin:0; font-size:0.92rem; color:var(--gold-deep); font-weight:900; display:flex; align-items:center; gap:6px;">
+                  <span>🚗</span> 點對點車程資料庫學習
+                </h4>
+                <div style="display:flex; gap:4px; flex-wrap:wrap;">
+                  <button type="button" class="button small" style="padding:2px 8px; font-size:0.7rem;" onclick="window.performItineraryAuditAndRouteCheck()">↻ 重新比對</button>
+                  <button type="button" class="button small primary" style="padding:2px 8px; font-size:0.7rem;" onclick="window.copyRoutesQueryPrompt()">📋 複製路段清單</button>
+                  <button type="button" class="button small gold" style="padding:2px 8px; font-size:0.7rem;" onclick="window.aiBatchEstimateRoutes()">🤖 AI 自動估算</button>
+                  <button type="button" class="button small" style="padding:2px 8px; font-size:0.7rem;" onclick="window.importRoutesFromTextPrompt()">📥 貼上路段清單</button>
+                </div>
+              </div>
+              <p style="margin:0 0 8px; font-size:0.74rem; color:var(--ink-sub);">
+                系統自動切分各天相鄰景點，可點「📋 複製路段清單」至外部 AI 查詢後點「📥 貼上路段清單」，或直接按「🤖 AI 自動估算」一鍵全自動查詢記住。
+              </p>
+              <div id="route-segments-list" style="display:flex; flex-direction:column; gap:6px; max-height:220px; overflow-y:auto; padding-right:4px;"></div>
+            </div>
+          </div>
+
+          <!-- 即時費用結算總覽卡片 -->
+          <div id="live-financial-summary-card" style="margin-top:14px; padding:16px; border:1.5px solid var(--gold-michelin); border-radius:12px; background:#FFFFFF;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; border-bottom:1px solid var(--border-gilded); padding-bottom:8px;">
+              <h4 style="margin:0; font-size:0.92rem; color:var(--gold-deep); font-weight:900;">
+                📊 系統即時費用與總預算結算
+              </h4>
+              <button class="button small gold" type="button" onclick="window.recalculateLiveSummary()">⚡ 重新計算總額</button>
+            </div>
+            <div id="live-summary-content" style="font-size:0.82rem; color:var(--ink-black); display:flex; flex-direction:column; gap:4px;">
+              <div><b>全程包車總車資：</b> <span id="summary-car-fare">NT$ 0</span></div>
+              <div id="summary-tickets-detail"><b>代訂票券明細：</b> 無</div>
+              <div id="summary-hotels-detail"><b>代訂飯店明細：</b> 無</div>
+              <div><b>已收定金：</b> <span id="summary-deposit" style="color:var(--burgundy-seal);">- NT$ 0</span></div>
+              <div style="border-top:1px dashed var(--border-gilded); margin-top:4px; padding-top:4px; font-weight:900; font-size:0.95rem; color:var(--gold-deep);">
+                現場結算總金額（應付總額）： <span id="summary-grand-total">NT$ 0</span>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <h4 style="margin:0 0 10px; font-size:0.95rem; color:var(--gold-deep); font-weight:800;">
+              🎫 景點門票與 🏨 飯店房費獨立代訂管理（僅符合項目）：
+            </h4>
+            <div id="independent-preorder-container"></div>
+          </div>
+
+          <div style="margin-top:14px; padding:14px 16px; border:1px solid var(--border-gilded); border-radius:12px; background:#FFFFFF; display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <span style="font-size:0.84rem; font-weight:800; color:var(--ink-black);">💰 已收定金 (NT$)：</span>
+              <p style="margin:2px 0 0; font-size:0.72rem; color:var(--ink-sub);">輸入定金後將自動同步至行程文字備註與生成器帳務。</p>
+            </div>
+            <input id="booking-deposit" type="number" value="0" min="0" step="100" placeholder="0" style="width:170px; padding:8px 12px; border:1px solid var(--border-gilded); border-radius:8px; font-weight:800; text-align:right; font-size:0.95rem; background:#FAF8F5;" oninput="window.syncDepositToWorkspace(this.value)">
+          </div>
+
+          <div style="margin-top:14px; padding:16px; border:1.5px solid var(--gold-michelin); border-radius:12px; background:#FFFFFF;">
+            <label style="display:block; font-size:0.86rem; font-weight:900; color:var(--ink-black); margin-bottom:6px;">
+              案件編號（<span style="color:var(--gold-deep)">選填；未填時自動產生</span>）
+            </label>
+            <input id="dispatch-finance-case-id" type="text" value="0828" placeholder="請輸入案件編號（例如：0828）" style="width:100%; padding:10px 12px; border:1px solid var(--border-gilded); border-radius:8px; font-weight:800; font-size:0.95rem; background:#FAF8F5;" oninput="window.updateOutputPreview(this.value)">
+            <p id="output-preview" style="margin:6px 0 0; font-size:0.78rem; font-weight:700; color:var(--gold-deep);">
+              將建立：網頁備份\2026_0828\（客戶專屬手帖 ＋ 司導任務單.html）
+            </p>
+          </div>
+
+          <div style="display:flex; gap:12px; margin-top:16px;">
+            <button class="button gold" type="button" style="padding:14px; flex:1; font-size:0.95rem;" onclick="window.openSelectedGenerator()">
+              🚀 自動建立案件並開啟 原鄉谷包車旅遊 行程生成器
+            </button>
+          </div>
+        </article>
+      </section>
+
+      <!-- 2. 營運總覽面板 -->
+      <section id="overview" class="panel">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Operations & Dispatch Monitor</div>
+            <h2>今日營運與出車監控看板</h2>
+            <p>掌握即時派車動態、未收現場款項與原鄉谷星鑰行程生成器就緒狀態。</p>
+          </div>
+        </div>
+        <div class="grid">
+          <article class="stat"><span>待確認訂單</span><strong>3</strong></article>
+          <article class="stat"><span>今日出車</span><strong>2</strong></article>
+          <article class="stat"><span>現場待收款</span><strong>$18,800</strong></article>
+          <article class="stat"><span>生成器核心</span><strong style="font-size:1.05rem; color:var(--gold-deep);">v1.6.79 就緒 ✓</strong></article>
+        </div>
+
+        <article class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-gilded); padding-bottom:10px;">
+            <h3 style="margin:0; font-size:1.05rem; color:var(--ink-black);">🚗 今日即時出車執勤動態</h3>
+            <span style="font-size:0.75rem; font-family:'Plus Jakarta Sans', sans-serif; color:var(--gold-deep); font-weight:700;">實時連線監控中</span>
+          </div>
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#FAF8F5; border:1px solid var(--border-gilded); border-radius:12px;">
+              <div>
+                <strong style="font-size:0.92rem; color:var(--ink-black);">Day 1 尊榮接機：TR867 班機抵達接駕</strong>
+                <p style="margin:4px 0 0; font-size:0.78rem; color:var(--ink-sub);">執勤司導：張其芳（TEB-6933）｜ 貴賓代表：陳先生 等共 4 人 ｜ 迎候時間：16:10</p>
+              </div>
+              <span style="font-size:0.76rem; font-weight:800; background:#FAF5ED; color:var(--gold-deep); padding:4px 12px; border-radius:99px; border:1px solid #DFBE7A;">巡航執勤中 ✓</span>
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:#FAF8F5; border:1px solid var(--border-gilded); border-radius:12px;">
+              <div>
+                <strong style="font-size:0.92rem; color:var(--ink-black);">Day 2 湖景私旅：日月潭全景遊湖巡航</strong>
+                <p style="margin:4px 0 0; font-size:0.78rem; color:var(--ink-sub);">執勤司導：林志祥（RAB-6789）｜ 貴賓代表：張代表 等共 6 人 ｜ 啟程時間：09:00</p>
+              </div>
+              <span style="font-size:0.76rem; font-weight:800; background:#FFFBEB; color:#92400E; padding:4px 12px; border-radius:99px; border:1px solid #FDE68A;">待收現場尾款 ⏳</span>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- 3. 訂單／派遣面板 -->
+      <section id="orders" class="panel">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Guest Dossier Ledger</div>
+            <h2>已登記包車訂單與司導調度中心</h2>
+            <p>調閱現有包車行程、指派專屬隨行司導，或一鍵將案件重新載回工作區修訂。</p>
+          </div>
+        </div>
+
+        <article class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; border-bottom:1px solid var(--border-gilded); padding-bottom:10px;">
+            <h3 style="margin:0; font-size:1.05rem; color:var(--ink-black);">📋 本期行程案件清單</h3>
+            <span style="font-size:0.75rem; color:var(--ink-sub);">共 2 筆進行中案件</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:12px;">
+            <div style="padding:16px; border:1px solid var(--border-gilded); border-radius:12px; background:#FFFFFF; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <span style="background:var(--ink-black); color:#FAF5ED; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:4px; font-family:'Cinzel', serif;">#1015</span>
+                  <strong style="font-size:0.94rem; color:var(--ink-black);">陳先生 等共 4 人 ｜ 5天4夜 尊榮接送機包車行程</strong>
+                </div>
+                <p style="margin:4px 0 0; font-size:0.78rem; color:var(--ink-sub);">出發區間：2026/10/15 ～ 10/19 ｜ 車資總額：$28,500 ｜ 現場應收：$28,500</p>
+                <p style="margin:2px 0 0; font-size:0.78rem; color:var(--gold-deep); font-weight:800;">執勤司導：張其芳（TEB-6933 / Benz Vito 9人座）</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="button small primary" onclick="window.bringOrderToWorkspace('1015')">📤 帶入工作區</button>
+                <button class="button small" onclick="window.showToast('已確認指派張其芳司導執勤。')">🚕 指派資訊</button>
+              </div>
+            </div>
+
+            <div style="padding:16px; border:1px solid var(--border-gilded); border-radius:12px; background:#FFFFFF; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+              <div>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <span style="background:var(--ink-black); color:#FAF5ED; font-size:0.72rem; font-weight:900; padding:2px 8px; border-radius:4px; font-family:'Cinzel', serif;">#1022</span>
+                  <strong style="font-size:0.94rem; color:var(--ink-black);">林小姐 等共 2 人 ｜ 3天2夜 中台灣湖光經典巡航</strong>
+                </div>
+                <p style="margin:4px 0 0; font-size:0.78rem; color:var(--ink-sub);">出發區間：2026/10/22 ～ 10/24 ｜ 車資總額：$18,000 ｜ 已收定金：$3,000</p>
+                <p style="margin:2px 0 0; font-size:0.78rem; color:var(--gold-deep); font-weight:800;">執勤司導：陳建榮（TDC-8053 / 九人座商務車）</p>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <button class="button small primary" onclick="window.bringOrderToWorkspace('1022')">📤 帶入工作區</button>
+                <button class="button small" onclick="window.showToast('已確認指派陳建榮司導執勤。')">🚕 指派資訊</button>
+              </div>
+            </div>
+          </div>
+        </article>
+      </section>
+
+      <!-- 4. 帳務面板 -->
+      <section id="finance" class="panel">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Financial Statement & Ledger</div>
+            <h2>車資、代收款、10% 派遣費與定金對帳中心</h2>
+            <p>支援個別司導自訂期間核算與全公司整月份帳務，自動換算司導 90% 實得與應繳回公司款項。</p>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="button small gold" onclick="window.exportFinanceToExcelCSV()">📊 結算並匯出 Excel (CSV)</button>
+            <button class="button small primary" onclick="window.exportFinanceToJSON()">💾 匯出 帳務總表.json</button>
+            <button class="button small" onclick="window.openStatementModal()">🧾 預覽／列印對帳單</button>
+            <button class="button small" onclick="window.resetFinanceFilters()">↻ 重置篩選</button>
+          </div>
+        </div>
+
+        <article class="card" style="background:#FAF8F5; border:1px dashed var(--gold-michelin); padding:12px 18px; margin-bottom:14px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.76rem; color:var(--ink-sub);">
+              📁 <b>專案帳務自動存檔：</b><code id="finance-folder-status" style="background:#FFFFFF; padding:2px 8px; border-radius:6px; border:1px solid var(--border-gilded); font-family:'Plus Jakarta Sans', monospace; color:var(--gold-deep); font-weight:800;">原鄉谷包車旅遊\帳務結算\ ✓ 已就緒</code>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="button small primary" type="button" onclick="window.chooseWorkspaceFolder()">📁 選擇/綁定專案資料夾</button>
+              <button class="button small" type="button" onclick="window.copyAccountingFolderPath()">📋 複製帳務目錄路徑</button>
+            </div>
+          </div>
+        </article>
+
+        <article class="card" style="background:#FAF8F5; border:1.5px solid var(--gold-michelin); padding:16px 20px;">
+          <h4 style="margin:0 0 8px; font-size:0.92rem; color:var(--gold-deep); font-weight:900;">
+            ✦ 原鄉谷包車旅遊標準對帳拆帳規則說明（米其林星鑰標準）
+          </h4>
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:12px; font-size:0.78rem; color:var(--ink-sub); line-height:1.65;">
+            <div><b>1. 現場向乘客收款：</b><br>現場現金 ＝ 車資總額 ＋ 代訂全額（門票/房費） － 已付定金</div>
+            <div><b>2. 公司應收收入與代墊款：</b><br>公司應收 ＝ 代訂全額（公司已全額代墊） ＋ 車資總額 × 10% 派遣費</div>
+            <div><b>3. 司導完工應繳回公司：</b><br>司導繳回公司 ＝ 現場收款 － (車資總額 × 90% 司導實得)</div>
+          </div>
+        </article>
+
+        <article class="card" style="padding:18px; margin-bottom:18px;">
+          <div style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+            <div style="flex:1; min-width:180px;">
+              <label style="display:block; font-size:0.76rem; font-weight:800; color:var(--ink-black); margin-bottom:4px;">帳務統計維度：</label>
+              <select id="finance-filter-mode" onchange="window.onFinanceFilterChange()" style="width:100%; padding:8px 10px; border:1px solid var(--border-gilded); border-radius:8px; font-size:0.83rem; font-weight:700; background:#FAF8F5;">
+                <option value="driver">👤 個別司導－自訂期間對帳</option>
+                <option value="monthly">📅 全公司－整月份總帳務</option>
+                <option value="all">📋 全部案件－綜合總覽</option>
+              </select>
+            </div>
+
+            <div id="filter-driver-box" style="flex:1; min-width:160px;">
+              <label style="display:block; font-size:0.76rem; font-weight:800; color:var(--ink-black); margin-bottom:4px;">選擇司導：</label>
+              <select id="finance-filter-driver" onchange="window.onFinanceFilterChange()" style="width:100%; padding:8px 10px; border:1px solid var(--border-gilded); border-radius:8px; font-size:0.83rem; font-weight:700; background:#FAF8F5;">
+                <option value="all">全體司導名冊</option>
+                <option value="張其芳">張其芳（TEB-6933）</option>
+                <option value="陳建榮">陳建榮（TDC-8053）</option>
+              </select>
+            </div>
+
+            <div id="filter-month-box" style="flex:1; min-width:140px; display:none;">
+              <label style="display:block; font-size:0.76rem; font-weight:800; color:var(--ink-black); margin-bottom:4px;">統計月份：</label>
+              <input type="month" id="finance-filter-month" value="2026-10" onchange="window.onFinanceFilterChange()" style="width:100%; padding:7px 10px; border:1px solid var(--border-gilded); border-radius:8px; font-size:0.83rem; background:#FAF8F5;">
+            </div>
+
+            <div id="filter-daterange-box" style="display:flex; gap:8px; align-items:flex-end; flex:2; min-width:280px;">
+              <div style="flex:1;">
+                <label style="display:block; font-size:0.76rem; font-weight:800; color:var(--ink-black); margin-bottom:4px;">起始日期：</label>
+                <input type="date" id="finance-filter-start" value="2026-10-01" onchange="window.onFinanceFilterChange()" style="width:100%; padding:7px 10px; border:1px solid var(--border-gilded); border-radius:8px; font-size:0.83rem; background:#FAF8F5;">
+              </div>
+              <div style="flex:1;">
+                <label style="display:block; font-size:0.76rem; font-weight:800; color:var(--ink-black); margin-bottom:4px;">結束日期：</label>
+                <input type="date" id="finance-filter-end" value="2026-10-31" onchange="window.onFinanceFilterChange()" style="width:100%; padding:7px 10px; border:1px solid var(--border-gilded); border-radius:8px; font-size:0.83rem; background:#FAF8F5;">
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <div class="grid" id="finance-kpi-grid">
+          <article class="stat"><span>篩選包車總車資</span><strong id="kpi-total-fare">$0</strong></article>
+          <article class="stat"><span>代訂項目(歸公司)</span><strong id="kpi-total-preorder">$0</strong></article>
+          <article class="stat"><span>公司 10% 派遣費</span><strong id="kpi-company-fee">$0</strong></article>
+          <article class="stat"><span>司導應繳回公司</span><strong id="kpi-driver-remit" style="color:var(--burgundy-seal);">$0</strong></article>
+        </div>
+
+        <article class="card">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0; font-size:1.05rem; color:var(--ink-black);" id="finance-table-title">📋 結算行程明細表</h3>
+            <span style="font-size:0.75rem; color:var(--ink-sub);" id="finance-table-count">共 0 筆記錄</span>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.71rem; text-align:left; line-height:1.35;">
+              <thead>
+                <tr style="background:#FAF8F5; border-bottom:1.5px solid var(--border-gilded); color:var(--gold-deep); font-size:0.68rem; white-space:nowrap;">
+                  <th style="padding:6px 4px;">案件編號</th>
+                  <th style="padding:6px 4px;">執勤司導</th>
+                  <th style="padding:6px 4px;">行程日期</th>
+                  <th style="padding:6px 4px; text-align:right;">車資總額</th>
+                  <th style="padding:6px 4px; text-align:right;">代訂(歸公司)</th>
+                  <th style="padding:6px 4px; text-align:right;">已收定金</th>
+                  <th style="padding:6px 4px; text-align:right; color:var(--burgundy-seal); font-weight:800;">現場應收現金</th>
+                  <th style="padding:6px 4px; text-align:right; font-weight:900; color:var(--burgundy-seal);">應繳回公司</th>
+                  <th style="padding:6px 4px; text-align:center;">結算狀態</th>
+                </tr>
+              </thead>
+              <tbody id="finance-table-body"></tbody>
+            </table>
+          </div>
+        </article>
+      </section>
+
+      <!-- 5. 景點資料庫面板 -->
+      <section id="places" class="panel">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Scenic Database & Stops</div>
+            <h2>景點停留時間與導航資料庫</h2>
+            <p>點擊卡片可展開與收合；停留時間、景點特色簡介與司導提醒皆可自由編輯儲存。</p>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button class="button small primary" onclick="window.addNewPlacePrompt()">＋ 新增自訂景點</button>
+            <button class="button small" onclick="window.toggleAllPlaces(true)">⊞ 全部展開</button>
+            <button class="button small" onclick="window.toggleAllPlaces(false)">⊟ 全部收合</button>
+            <button class="button small danger" onclick="window.resetPlacesToDefault()">↻ 還原預設資料</button>
+          </div>
+        </div>
+
+        <article class="card">
+          <div id="places-accordion-list"></div>
+        </article>
+      </section>
+
+      <!-- 6. 系統設定面板 -->
+      <section id="settings" class="panel">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Environment & Settings</div>
+            <h2>行程生成器路徑與平台營運參數設定</h2>
+            <p>指定同目錄下的正式原鄉谷行程生成器檔案，系統已具備空白修剪與自動副檔名補齊防呆。</p>
+          </div>
+        </div>
+
+        <article class="card" style="border: 1.5px solid var(--gold-michelin); background: #FAF8F5;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 style="margin:0; font-size:1.05rem; color:var(--ink-black);">🔗 原鄉谷行程生成器檔案路徑指定</h3>
+            <span style="font-size:0.75rem; background:var(--gold-light); color:var(--gold-deep); font-weight:800; padding:3px 10px; border-radius:99px; border:1px solid #DFCFAE;">相對路徑直連 ✓</span>
+          </div>
+          <p style="margin:0 0 12px; font-size:0.8rem; color:var(--ink-sub);">
+            指定與管理後台同目錄下的正式生成器檔名。若不確定檔名是否有多打副檔名，可點擊「📁 瀏覽選取檔案」自動抓取硬碟真實檔名。
+          </p>
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <input id="generator-path" type="text" style="flex:1; min-width:280px; padding:10px 12px; border:1px solid var(--border-gilded); border-radius:8px; font-weight:800; font-size:0.88rem; background:#FFFFFF;" value="原鄉谷包車旅遊_行程生成器.html">
+            <button type="button" class="button" onclick="document.getElementById('local-gen-file-picker').click()">📁 瀏覽選取檔案</button>
+            <input type="file" id="local-gen-file-picker" accept=".html,.htm" style="display:none;" onchange="window.handleSelectGeneratorFile(this.files)">
+            <button type="button" class="button primary" style="padding:10px 16px;" onclick="window.testOpenGenerator()">🧪 測試開啟生成器</button>
+          </div>
+        </article>
+
+        <article class="card">
+          <h3 style="margin:0 0 14px; font-size:1.05rem; color:var(--ink-black);">⚙️ 營運參數與對帳匯款帳號維護</h3>
+          <div class="edit-form-grid">
+            <div class="edit-field">
+              <label>預設每日出發時間：</label>
+              <input id="setting-default-departure" type="time" value="09:00">
+            </div>
+            <div class="edit-field">
+              <label>公司派遣費比例 (%)：</label>
+              <input id="setting-dispatch-rate" type="number" min="1" max="100" value="10">
+            </div>
+            <div class="edit-field">
+              <label>司導實得車資比例 (%)：</label>
+              <input id="setting-driver-rate" type="number" min="1" max="100" value="90" readonly style="background:#FAF8F5; color:var(--ink-sub);">
+            </div>
+          </div>
+
+          <h4 style="margin:16px 0 10px; font-size:0.92rem; color:var(--gold-deep); border-top:1px dashed var(--border-gilded); padding-top:14px;">
+            🏦 原鄉谷包車旅遊公司代收繳回匯款帳號
+          </h4>
+          <div class="edit-form-grid">
+            <div class="edit-field">
+              <label>收款帳戶戶名：</label>
+              <input id="setting-bank-holder" type="text" value="" placeholder="請輸入收款戶名...">
+            </div>
+            <div class="edit-field">
+              <label>銀行名稱與代碼：</label>
+              <input id="setting-bank-name" type="text" value="" placeholder="例如：國泰世華銀行（013）">
+            </div>
+            <div class="edit-field">
+              <label>分行名稱：</label>
+              <input id="setting-bank-branch" type="text" value="" placeholder="例如：魚池分行">
+            </div>
+            <div class="edit-field">
+              <label>公司收款銀行帳號：</label>
+              <input id="setting-bank-account" type="text" value="" placeholder="請輸入匯款帳號...">
+            </div>
+          </div>
+
+          <div class="edit-actions">
+            <button type="button" class="button" onclick="window.resetSystemSettings()">↻ 清空重填</button>
+            <button type="button" class="button primary" style="padding:10px 22px;" onclick="window.saveSystemSettings()">💾 儲存系統設定</button>
+          </div>
+        </article>
+      </section>
+
+      <!-- 7. 網站管理面板 -->
+      <section id="other" class="panel">
+        <div class="hero">
+          <div>
+            <div class="eyebrow">Public Showcase Management</div>
+            <h2>原鄉谷包車旅遊公開精選行程官方網站管理</h2>
+            <p>即時修改對外發布之形象官網網址、品牌標語與精選私旅推薦路線。</p>
+          </div>
+          <a id="site-visit-link" class="button gold" href="https://tdb8053-bit.github.io/Website/" target="_blank" rel="noopener">
+            🌐 前往公開官方網站 ➔
+          </a>
+        </div>
+
+        <article class="card">
+          <div class="edit-form-grid" style="grid-template-columns: 1fr;">
+            <div class="edit-field">
+              <label>官方網站正式發布網址 (URL)：</label>
+              <div style="display:flex; gap:8px; align-items:center;">
+                <input id="site-setting-url" type="url" style="flex:1;" value="https://tdb8053-bit.github.io/Website/">
+                <button type="button" class="button" onclick="window.copySiteUrl()">📋 複製網址</button>
+                <a id="site-direct-jump-btn" href="https://tdb8053-bit.github.io/Website/" target="_blank" rel="noopener" class="button primary">🌐 開啟網站</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="edit-form-grid">
+            <div class="edit-field">
+              <label>主視覺品牌標語（中文）：</label>
+              <input id="site-setting-slogan-zh" type="text" value="探索寶島福爾摩沙之美，專屬奢華私旅。">
+            </div>
+            <div class="edit-field">
+              <label>主視覺副標語（英文）：</label>
+              <input id="site-setting-slogan-en" type="text" value="Curated Expedition in Formosa.">
+            </div>
+          </div>
+
+          <div class="edit-form-grid">
+            <div class="edit-field">
+              <label>客服專線電話：</label>
+              <input id="site-setting-phone" type="text" value="" placeholder="請輸入客服電話...">
+            </div>
+            <div class="edit-field">
+              <label>官方 LINE 諮詢 ID：</label>
+              <input id="site-setting-line" type="text" value="" placeholder="請輸入官方 LINE ID...">
+            </div>
+          </div>
+
+          <div class="edit-field" style="margin-bottom: 12px;">
+            <label>精選推薦包車路線：</label>
+            <textarea id="site-setting-routes" rows="3">1. 阿里山日出雲海二日遊（小火車、神木群、雲海觀日）
+2. 日月潭清境三日遊（遊湖遊船、青青草原綿羊秀、老街巡禮）
+3. 九份十分經典一日遊（十分放天燈、十分瀑布、山城茶樓夜景）</textarea>
+          </div>
+
+          <div class="edit-actions">
+            <button type="button" class="button" onclick="window.resetWebsiteSettings()">↻ 還原預設內容</button>
+            <button type="button" class="button primary" style="padding: 10px 22px;" onclick="window.saveWebsiteSettings()">💾 儲存網站設定</button>
+          </div>
+        </article>
+      </section>
+    </section>
+
+    <!-- 8. 操作導引右側欄 -->
+    <aside class="guide" id="dynamic-guide-container">
+      <div class="guide-header">
+        <h2 id="guide-title">📖 設定與使用手帖</h2>
+        <p id="guide-subtitle">掌握當前功能面板的操作流程與重點說明</p>
+      </div>
+      <div id="guide-steps-list"></div>
+    </aside>
+  </main>
+
+  <div id="statement-modal" class="statement-modal-backdrop" role="dialog" aria-modal="true">
+    <div class="statement-modal-card">
+      <div class="statement-modal-header">
+        <h3 id="statement-modal-title">🧾 司導任務結算對帳單</h3>
+        <button type="button" class="button small" style="background:transparent; color:#FAF5ED; border:0; font-size:1.2rem; padding:2px 8px;" onclick="window.closeStatementModal()">✕</button>
+      </div>
+      
+      <div class="statement-modal-body" id="statement-printable-sheet"></div>
+
+      <div class="statement-modal-footer">
+        <div style="font-size:0.76rem; color:var(--ink-sub);">
+          💡 點擊「列印」可另存為 PDF，或點「複製 LINE 文字」直接發送司導。
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="button small" onclick="window.copyStatementLineText()">📲 複製 LINE 對帳文字</button>
+          <button type="button" class="button small gold" onclick="window.printStatementSheet()">🖨️ 列印對帳單 / 存為 PDF</button>
+          <button type="button" class="button small" onclick="window.closeStatementModal()">關閉</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const defaultGeneratorFileName = '原鄉谷包車旅遊_行程生成器.html';
+    window.itemPricingState = window.itemPricingState || {};
+
+    // ==============================================================
+    // 原鄉谷包車路段學習庫 (Route Learning Database)
+    // ==============================================================
+    const ROUTE_CACHE_KEY = 'yxg_route_durations_cache_v1';
+    const defaultRouteDurations = {
+      '桃園國際機場 -> 勝興車站舊山線鐵道自行車': { minutes: 80, note: '國道一號南下苗栗三義' },
+      '勝興車站舊山線鐵道自行車 -> 台中逢甲商旅': { minutes: 50, note: '台13線南下接大雅交流道' },
+      '台中逢甲商旅 -> 日月潭遊湖': { minutes: 75, note: '國道六號愛蘭交流道接台21線' },
+      '日月潭遊湖 -> 向山遊客中心': { minutes: 12, note: '台21線環湖路段' },
+      '向山遊客中心 -> 清境農場國民賓館': { minutes: 70, note: '台21轉台14線接台14甲' },
+      '清境農場國民賓館 -> 台北市區自由採買伴手禮': { minutes: 190, note: '國道六號接國道三號北上' },
+      '台北市區自由採買伴手禮 -> 桃園國際機場送機': { minutes: 50, note: '國道一號直通機場' },
+      '桃園國際機場 -> 台北君悅酒店': { minutes: 50, note: '國道二號接國道一號' },
+      '台北君悅酒店 -> 日月潭遊湖': { minutes: 170, note: '國道三號接國道六號' },
+      '日月潭遊湖 -> 日月潭馥麗溫泉大飯店': { minutes: 10, note: '水社碼頭周邊' },
+      '日月潭馥麗溫泉大飯店 -> 清境農場': { minutes: 75, note: '台21接台14' },
+      '清境農場 -> 清境佛羅倫斯渡假山莊': { minutes: 12, note: '清境山區路段' },
+      '清境佛羅倫斯渡假山莊 -> 勝興車站鐵道自行車': { minutes: 105, note: '國六接國一北上' },
+      '勝興車站鐵道自行車 -> 台中逢甲商旅': { minutes: 45, note: '台13線南下' },
+      '台中逢甲商旅 -> 彩虹眷村': { minutes: 25, note: '台中市區環線' },
+      '彩虹眷村 -> 春水堂創始店': { minutes: 25, note: '台中市區' },
+      '春水堂創始店 -> 逢甲夜市': { minutes: 30, note: '市區尖峰車流' },
+      '逢甲夜市 -> 台中逢甲商旅': { minutes: 8, note: '逢甲商圈周邊' },
+      '桃園國際機場 -> 嘉義樂客商旅': { minutes: 180, note: '國道一號南下轉國道三號' },
+      '桃園機場 -> 嘉義樂客商旅': { minutes: 180, note: '國道一號南下轉國道三號' },
+      '嘉義樂客商旅 -> 阿里山國家森林遊樂區': { minutes: 100, note: '台18線阿里山公路' },
+      '阿里山園區 -> 臺中逢甲商旅': { minutes: 180, note: '台18接國三轉台74' },
+      '野柳地質公園 -> 桃子海岸': { minutes: 15, note: '北部濱海公路' },
+      '桃子海岸 -> 十分瀑布': { minutes: 45, note: '基平橋接十分風景區' },
+      '十分老街 -> 九份老街': { minutes: 35, note: '瑞平公路轉102縣道' }
+    };
+
+    window.loadRouteCache = function() {
+      try {
+        const saved = localStorage.getItem(ROUTE_CACHE_KEY);
+        if (saved) return Object.assign({}, defaultRouteDurations, JSON.parse(saved));
+      } catch (_) {}
+      return Object.assign({}, defaultRouteDurations);
+    };
+
+    window.saveRouteCache = function(cache) {
+      try {
+        localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify(cache));
+      } catch (_) {}
+    };
+
+    window.saveSingleRouteDuration = function(from, to, minutesInputId) {
+      const inputEl = document.getElementById(minutesInputId);
+      const val = parseInt(inputEl?.value, 10);
+      if (!val || val <= 0) {
+        window.showToast('⚠️ 請輸入有效的車程分鐘數！');
+        return;
+      }
+      const key1 = `${from.trim()} -> ${to.trim()}`;
+      const key2 = `${to.trim()} -> ${from.trim()}`;
+      const cache = window.loadRouteCache();
+      cache[key1] = { minutes: val, note: '使用者自訂記住' };
+      cache[key2] = { minutes: val, note: '使用者自訂記住' };
+      window.saveRouteCache(cache);
+      window.performItineraryAuditAndRouteCheck();
+      window.showToast(`💾 已成功記住「${from} ➔ ${to}」車程：約 ${val} 分鐘！`);
+    };
+
+    window.promptEditRouteDuration = function(from, to, currentMin) {
+      const input = prompt(`請輸入「${from} ➔ ${to}」的正確車程時間（分鐘）：\n（提示：例如台北至日月潭約 170 分鐘，阿里山至台中約 180 分鐘）`, currentMin || 160);
+      if (input !== null) {
+        const val = parseInt(input, 10);
+        if (!val || val <= 0) {
+          window.showToast('⚠️ 請輸入有效的車程分鐘數！');
+          return;
+        }
+        const key1 = `${from.trim()} -> ${to.trim()}`;
+        const key2 = `${to.trim()} -> ${from.trim()}`;
+        const cache = window.loadRouteCache();
+        cache[key1] = { minutes: val, note: '使用者手動修正' };
+        cache[key2] = { minutes: val, note: '使用者手動修正' };
+        window.saveRouteCache(cache);
+        window.performItineraryAuditAndRouteCheck();
+        window.showToast(`💾 已成功將「${from} ➔ ${to}」車程更正為：約 ${val} 分鐘！`);
+      }
+    };
+
+    window.deleteRouteDuration = function(from, to) {
+      const key1 = `${from.trim()} -> ${to.trim()}`;
+      const key2 = `${to.trim()} -> ${from.trim()}`;
+      const cache = window.loadRouteCache();
+      delete cache[key1];
+      delete cache[key2];
+      window.saveRouteCache(cache);
+      window.performItineraryAuditAndRouteCheck();
+      window.showToast(`🗑️ 已清除「${from} ➔ ${to}」之車程記錄，可重新輸入！`);
+    };
+
+    // ==============================================================
+    // ✈️ 機場接送機智慧解析模組 (自動辨識並帶出接機卡)
+    // ==============================================================
+    window.parseAirportPickupDropoffInfo = function(text) {
+      if (!text) return { pickup: null, dropoff: null };
+
+      let pickup = null;
+      let dropoff = null;
+
+      // 檢查是否含有接機特徵
+      const hasPickupSignal = /接機|抵達|航班|班機|降落|抵達航廈|航廈/i.test(text);
+      if (hasPickupSignal) {
+        let flight = '';
+        let time = '';
+        let date = '';
+        let terminal = 'T1';
+        let location = '桃園國際機場';
+
+        const fMatch = text.match(/(?:航班編號|抵達航班|航班|班機)[：:\s]*([A-Z0-9]{2,8})/i) ||
+                       text.match(/(?:接機[^\n]*?)([A-Z]{2,3}\s*\d{2,4})/i) ||
+                       text.match(/\b([A-Z]{2}\s*\d{3,4})\b/);
+        if (fMatch) flight = fMatch[1].replace(/\s+/g, '').toUpperCase();
+
+        const tMatch = text.match(/(?:抵達時間|降落時間|時間)[：:\s]*(\d{1,2}[:：]\d{2})/i) ||
+                       text.match(/(?:接機[^\n]*?)(\d{1,2}[:：]\d{2})/i) ||
+                       text.match(/\b(\d{1,2}[:：]\d{2})\s*(?:抵達|降落|到)/i);
+        if (tMatch) time = tMatch[1].replace('：', ':');
+
+        const dMatch = text.match(/(?:抵達日期|接機日期|日期)[：:]\s*(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/i) ||
+                       text.match(/包車開始日期[：:]\s*(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/i);
+        if (dMatch) date = dMatch[1].replace(/-/g, '/');
+
+        const termMatch = text.match(/(?:抵達航廈|航廈|航站)[：:\s]*(T1|T2|第一航廈|第二航廈|一航|二航)/i);
+        if (termMatch) {
+          const rawT = termMatch[1].toUpperCase();
+          terminal = (rawT.includes('2') || rawT.includes('二')) ? 'T2' : 'T1';
+        }
+
+        if (text.includes('松山')) location = '台北松山機場';
+        else if (text.includes('小港')) location = '高雄小港機場';
+        else if (text.includes('清泉崗') || text.includes('台中機場')) location = '台中清泉崗機場';
+        else if (text.includes('桃園')) location = '桃園國際機場';
+
+        if (flight || time || text.includes('接機資訊')) {
+          pickup = {
+            flight: flight || 'TR867',
+            time: time || '15:10',
+            date: date || '2026/08/28',
+            terminal,
+            location,
+            meetingPoint: `${location} ${terminal} 抵達大廳`
+          };
+        }
+      }
+
+      // 檢查是否含有送機特徵
+      const hasDropoffSignal = /送機|起飛|離境|離台/i.test(text);
+      if (hasDropoffSignal) {
+        let flight = '';
+        let time = '';
+        let date = '';
+        let terminal = 'T2';
+        let location = '桃園國際機場';
+
+        const dfMatch = text.match(/(?:送機航班|起飛航班|離境航班)[：:]\s*([A-Z0-9]{2,8})/i) ||
+                        text.match(/(?:送機[^\n]*?)([A-Z]{2,3}\s*\d{2,4})/i);
+        if (dfMatch) flight = dfMatch[1].replace(/\s+/g, '').toUpperCase();
+
+        const dtMatch = text.match(/(?:起飛時間|送機時間)[：:]\s*(\d{1,2}[:：]\d{2})/i) ||
+                        text.match(/(?:送機[^\n]*?)(\d{1,2}[:：]\d{2})/i);
+        if (dtMatch) time = dtMatch[1].replace('：', ':');
+
+        const ddMatch = text.match(/(?:送機日期|起飛日期)[：:]\s*(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/i) ||
+                        text.match(/包車結束日期[：:]\s*(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/i);
+        if (ddMatch) date = ddMatch[1].replace(/-/g, '/');
+
+        const dtermMatch = text.match(/(?:出發航廈|起飛航廈)[：:]\s*(T1|T2|第一航廈|第二航廈|一航|二航)/i);
+        if (dtermMatch) {
+          const rawDT = dtermMatch[1].toUpperCase();
+          terminal = (rawDT.includes('1') || rawDT.includes('一')) ? 'T1' : 'T2';
+        }
+
+        if (text.includes('松山')) location = '台北松山機場';
+        else if (text.includes('小港')) location = '高雄小港機場';
+        else if (text.includes('清泉崗') || text.includes('台中機場')) location = '台中清泉崗機場';
+
+        if (flight || time || text.includes('送機')) {
+          dropoff = {
+            flight: flight || 'BR197',
+            time: time || '18:30',
+            date: date || '2026/09/02',
+            terminal,
+            location,
+            meetingPoint: `${location} ${terminal}`
+          };
+        }
+      }
+
+      return { pickup, dropoff };
+    };
+
+    window.renderBackendFlightCardUI = function() {
+      const textarea = document.getElementById('standard-text-workspace');
+      const cardEl = document.getElementById('backend-flight-card');
+      const detailsEl = document.getElementById('backend-flight-details');
+      if (!textarea || !cardEl || !detailsEl) return;
+
+      const { pickup, dropoff } = window.parseAirportPickupDropoffInfo(textarea.value);
+
+      if (!pickup && !dropoff) {
+        cardEl.style.display = 'none';
+        return;
+      }
+
+      cardEl.style.display = 'block';
+      let html = '';
+
+      if (pickup) {
+        html += `
+          <div style="background:#FFFFFF; border:1px solid #DFCFAE; border-radius:8px; padding:10px 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #FAF5ED; padding-bottom:4px; margin-bottom:6px;">
+              <strong style="color:var(--gold-deep); font-size:0.8rem;">🛬 接機資訊：${pickup.location}</strong>
+              <span style="background:var(--gold-light); color:var(--gold-deep); font-weight:800; padding:1px 6px; border-radius:4px; font-size:0.68rem;">迎賓接駕</span>
+            </div>
+            <div><b>抵達日期：</b>${pickup.date}</div>
+            <div><b>航班編號：</b><span style="font-family:monospace; font-weight:800; color:var(--ink-black);">${pickup.flight}</span> (${pickup.terminal} 航廈)</div>
+            <div><b>抵達時間：</b>${pickup.time} <span style="color:#2F6F4E; font-size:0.7rem; font-weight:700;">(Day 1 出發自動排為抵達 +1hr)</span></div>
+          </div>
+        `;
+      }
+
+      if (dropoff) {
+        html += `
+          <div style="background:#FFFFFF; border:1px solid #DFCFAE; border-radius:8px; padding:10px 12px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #FAF5ED; padding-bottom:4px; margin-bottom:6px;">
+              <strong style="color:var(--gold-deep); font-size:0.8rem;">🛫 送機資訊：${dropoff.location}</strong>
+              <span style="background:#E3EDE8; color:#2F6F4E; font-weight:800; padding:1px 6px; border-radius:4px; font-size:0.68rem;">平安送機</span>
+            </div>
+            <div><b>送機日期：</b>${dropoff.date}</div>
+            <div><b>航班編號：</b><span style="font-family:monospace; font-weight:800; color:var(--ink-black);">${dropoff.flight}</span> (${dropoff.terminal} 航廈)</div>
+            <div><b>起飛時間：</b>${dropoff.time}</div>
+          </div>
+        `;
+      }
+
+      detailsEl.innerHTML = html;
+    };
+
+    window.syncFlightInfoToWorkspacePrompt = function() {
+      const flight = prompt('請輸入接機航班編號（例如：TR867）：', 'TR867');
+      if (!flight) return;
+      const time = prompt('請輸入抵達時間（例如：15:10）：', '15:10');
+      const terminal = prompt('請輸入抵達航廈（T1 或 T2）：', 'T1') || 'T1';
+
+      const textarea = document.getElementById('standard-text-workspace');
+      if (!textarea) return;
+
+      let text = textarea.value;
+      const pickupBlock = `接機資訊\n航班編號：${flight.trim().toUpperCase()}\n抵達時間：${time.trim()}\n抵達航廈：${terminal.trim().toUpperCase()}\n接機地點：桃園機場\n\n`;
+
+      if (/接機資訊/i.test(text)) {
+        text = text.replace(/接機資訊[\s\S]*?(?=Day\s*1)/i, pickupBlock);
+      } else {
+        text = pickupBlock + text;
+      }
+
+      textarea.value = text;
+      window.handleWorkspaceInputChanged();
+      window.showToast('✨ 已成功更新接機資訊並寫入行程文字！');
+    };
+
+    window.performItineraryAuditAndRouteCheck = function() {
+      const textarea = document.getElementById('standard-text-workspace');
+      if (!textarea) return;
+      const text = textarea.value || '';
+
+      const auditListEl = document.getElementById('audit-items-list');
+      const routeListEl = document.getElementById('route-segments-list');
+      const auditScoreStat = document.getElementById('audit-score-stat');
+      const auditBadge = document.getElementById('audit-badge');
+      const routeConfirmedStat = document.getElementById('route-confirmed-stat');
+      const routeCoverageBadge = document.getElementById('route-coverage-badge');
+
+      const auditIssues = [];
+      let totalPoints = 100;
+
+      // 1. 聯絡電話檢查
+      const phoneMatch = text.match(/聯絡電話[：:]\s*([^\r\n]+)/);
+      if (!phoneMatch || !phoneMatch[1].trim() || /Day\s*1/i.test(phoneMatch[1])) {
+        auditIssues.push({ type: 'danger', icon: '🔴', text: '尚未填寫預約代表聯絡電話' });
+        totalPoints -= 15;
+      }
+
+      // 2. 住宿確認 (排查模糊飯店，但保留嘉義樂客商旅等具體飯店)
+      const hotelMatches = [...text.matchAll(/住宿飯店[：:]\s*([^\r\n]+)/g)];
+      if (hotelMatches.length === 0) {
+        auditIssues.push({ type: 'danger', icon: '🔴', text: '行程內未指定任何住宿飯店' });
+        totalPoints -= 15;
+      } else {
+        const vagueHotels = hotelMatches.filter(m => /台北各大飯店|各大飯店|未定|自理/i.test(m[1].trim()));
+        if (vagueHotels.length > 0) {
+          auditIssues.push({ type: 'warning', icon: '🟡', text: `有 ${vagueHotels.length} 天住宿為模糊飯店（如：台北各大飯店/未定）` });
+          totalPoints -= 10;
+        }
+      }
+
+      // 3. 午餐與晚餐檢查
+      if (!/午餐|推薦合菜|老街午餐|在地風味|晚餐/.test(text)) {
+        auditIssues.push({ type: 'warning', icon: '🟡', text: '行程中尚未規劃推薦午餐或在地特色餐廳' });
+        totalPoints -= 10;
+      }
+
+      // 4. 接機送機完整性
+      if (text.includes('接機資訊') && !/航班編號[：:]\s*[A-Z0-9]+/i.test(text)) {
+        auditIssues.push({ type: 'warning', icon: '🟡', text: '接機日尚未確認抵達航班編號' });
+        totalPoints -= 10;
+      }
+      if (text.includes('送機資訊') && !/航班編號[：:]\s*[A-Z0-9]+/i.test(text)) {
+        auditIssues.push({ type: 'warning', icon: '🟡', text: '送機日尚未確認起飛航班編號' });
+        totalPoints -= 10;
+      }
+
+      // 5. 每日車資確認
+      const fareMatches = [...text.matchAll(/今日車資[：:]\s*([^\r\n]+)/g)];
+      const zeroFares = fareMatches.filter(m => !parseInt(m[1].replace(/[^\d]/g, ''), 10));
+      const dayCount = [...text.matchAll(/^Day\s+\d+\s*$/gmi)].length;
+      if (zeroFares.length > 0 || fareMatches.length < dayCount) {
+        auditIssues.push({ type: 'danger', icon: '🔴', text: `有 ${zeroFares.length + Math.max(0, dayCount - fareMatches.length)} 天尚未設定當日包車車資` });
+        totalPoints -= 15;
+      }
+      if (/勝興.*(?:鐵(?:道|路)自行車|腳踏(?:火車|車))|鐵(?:道|路)自行車/.test(text) && !/^(?:勝興預約時間|預約時間)[：:]\s*\d{1,2}:\d{2}/m.test(text)) {
+        auditIssues.push({ type: 'warning', icon: '🟡', text: '勝興鐵路自行車尚未確認預約班次；必須先預約才有票' });
+        totalPoints -= 10;
+      }
+
+      totalPoints = Math.max(20, totalPoints);
+      if (auditScoreStat) auditScoreStat.textContent = `${totalPoints}%`;
+      if (auditBadge) {
+        if (totalPoints >= 85) {
+          auditBadge.textContent = '完整良好 ✓';
+          auditBadge.style.background = 'var(--gold-light)';
+          auditBadge.style.color = 'var(--gold-deep)';
+        } else if (totalPoints >= 60) {
+          auditBadge.textContent = '有待補項目 ⏳';
+          auditBadge.style.background = '#FFFBEB';
+          auditBadge.style.color = '#B45309';
+        } else {
+          auditBadge.textContent = '急需補齊 ⚠️';
+          auditBadge.style.background = '#FEE2E2';
+          auditBadge.style.color = 'var(--burgundy-seal)';
+        }
+      }
+
+      if (auditListEl) {
+        if (auditIssues.length === 0) {
+          auditListEl.innerHTML = `
+            <div style="padding:10px 14px; background:#FAF5ED; border-radius:8px; border:1px solid #DFCFAE; color:var(--gold-deep); font-weight:800;">
+              ✨ 行程資料非常完整！所有關鍵項目均已備妥。
+            </div>
+          `;
+        } else {
+          auditListEl.innerHTML = auditIssues.map(issue => `
+            <div style="display:flex; align-items:center; gap:8px; padding:6px 10px; background:${issue.type === 'danger' ? '#FFF5F5' : '#FFFBEB'}; border-radius:6px; border:1px solid ${issue.type === 'danger' ? '#FECDD3' : '#FDE68A'};">
+              <span>${issue.icon}</span>
+              <span style="color:${issue.type === 'danger' ? 'var(--burgundy-seal)' : '#92400E'}; font-weight:700;">${issue.text}</span>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 切分點對點路段
+      const cache = window.loadRouteCache();
+      const segments = [];
+      const dayBlocks = text.split(/(?=Day\s*\d+)/i).filter(b => /Day\s*\d+/i.test(b));
+
+      dayBlocks.forEach((block, dayIdx) => {
+        const lines = block.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+        let departure = '';
+        let hotel = '';
+        let spots = [];
+        let inSpots = false;
+
+        lines.forEach(l => {
+          if (/^(?:出發地點|出發起點|起點)[：:]/i.test(l)) departure = l.replace(/^(?:出發地點|出發起點|起點)[：:]/i, '').trim();
+          if (/^(?:住宿飯店|當晚住宿飯店|飯店|酒店)[：:]/i.test(l)) { hotel = l.replace(/^(?:住宿飯店|當晚住宿飯店|飯店|酒店)[：:]/i, '').trim(); inSpots = false; }
+          if (/^行程內容[：:]?/i.test(l)) { inSpots = true; return; }
+          if (/^(?:今日車資|出發時間)[：:]/i.test(l)) { inSpots = false; }
+          if (inSpots && !l.includes('：')) {
+            spots.push(l);
+          }
+        });
+
+        const stopSequence = [];
+        if (departure) stopSequence.push(departure);
+        stopSequence.push(...spots);
+        if (hotel && hotel !== '未定' && hotel !== '台北各大飯店') stopSequence.push(hotel);
+
+        for (let i = 0; i < stopSequence.length - 1; i++) {
+          const from = stopSequence[i];
+          const to = stopSequence[i + 1];
+          if (from && to && from !== to) {
+            segments.push({ day: dayIdx + 1, from, to });
+          }
+        }
+      });
+
+      window.currentItinerarySegments = segments;
+
+      let confirmedCount = 0;
+      if (routeListEl) {
+        if (segments.length === 0) {
+          routeListEl.innerHTML = `<div style="font-size:0.76rem; color:var(--ink-sub); padding:10px; text-align:center;">尚無切分路段。</div>`;
+        } else {
+          routeListEl.innerHTML = segments.map((seg, idx) => {
+            const key1 = `${seg.from} -> ${seg.to}`;
+            const key2 = `${seg.to} -> ${seg.from}`;
+            const found = cache[key1] || cache[key2];
+            const isConfirmed = !!found;
+            if (isConfirmed) confirmedCount++;
+
+            const inputId = `route-min-input-${idx}`;
+            return `
+              <div style="padding:8px 10px; background:${isConfirmed ? '#FAF8F5' : '#FFFDF5'}; border:1px solid ${isConfirmed ? 'var(--border-gilded)' : '#DFBE7A'}; border-radius:8px; display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <div style="flex:1; min-width:0;">
+                  <div style="font-weight:800; font-size:0.78rem; color:var(--ink-black); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+                    <span style="color:var(--gold-deep);">D${seg.day}</span> ${seg.from} ➔ ${seg.to}
+                  </div>
+                  <div style="font-size:0.68rem; color:${isConfirmed ? 'var(--gold-deep)' : '#B45309'}; margin-top:2px;">
+                    ${isConfirmed ? `✓ 已確認：約 ${found.minutes} 分鐘 ${found.note ? `(${found.note})` : ''}` : '⏳ 尚未記錄車程'}
+                  </div>
+                </div>
+                <div>
+                  ${isConfirmed ? `
+                    <div style="display:flex; align-items:center; gap:4px;">
+                      <span style="font-size:0.74rem; font-weight:800; background:var(--gold-light); color:var(--gold-deep); padding:2px 8px; border-radius:99px; border:1px solid #DFCFAE; white-space:nowrap;">
+                        ${found.minutes}分
+                      </span>
+                      <button type="button" class="button small" style="padding:2px 6px; font-size:0.68rem;" onclick="window.promptEditRouteDuration('${seg.from}', '${seg.to}', ${found.minutes})" title="點擊修改時間">✏️ 修改</button>
+                      <button type="button" class="button small danger" style="padding:2px 6px; font-size:0.68rem;" onclick="window.deleteRouteDuration('${seg.from}', '${seg.to}')" title="刪除此筆記錄">✕</button>
+                    </div>
+                  ` : `
+                    <div style="display:flex; gap:4px; align-items:center;">
+                      <input id="${inputId}" type="number" placeholder="輸入分鐘" style="width:72px; padding:3px 6px; font-size:0.74rem; border:1px solid var(--border-gilded); border-radius:4px; text-align:center;" value="">
+                      <button type="button" class="button small gold" style="padding:3px 7px; font-size:0.68rem;" onclick="window.saveSingleRouteDuration('${seg.from}', '${seg.to}', '${inputId}')">💾 記住</button>
+                    </div>
+                  `}
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
+
+      if (routeConfirmedStat) routeConfirmedStat.textContent = `${confirmedCount} / ${segments.length} 段`;
+      if (routeCoverageBadge) {
+        const pct = segments.length > 0 ? Math.round((confirmedCount / segments.length) * 100) : 100;
+        routeCoverageBadge.textContent = `${pct}% 已掌握`;
+      }
+    };
+
+    window.copyRoutesQueryPrompt = function() {
+      const segments = window.currentItinerarySegments || [];
+      if (segments.length === 0) {
+        window.showToast('⚠️ 目前工作區尚無行程景點路段可複製！');
+        return;
+      }
+
+      const cache = window.loadRouteCache();
+      let promptText = `請以台灣專業包車旅遊（九人座商務車、正常白天行車速度與路況）為基準，為我評估以下各點對點路段的「合理行車時間（分鐘數）」：\n\n`;
+      
+      segments.forEach((seg, i) => {
+        const key1 = `${seg.from} -> ${seg.to}`;
+        const key2 = `${seg.to} -> ${seg.from}`;
+        const cached = cache[key1] || cache[key2];
+        const status = cached ? `（目前記錄：約 ${cached.minutes} 分鐘）` : `（未記錄，請估算）`;
+        promptText += `${i + 1}. Day ${seg.day}：${seg.from} ➔ ${seg.to} ${status}\n`;
+      });
+
+      promptText += `\n請嚴格依照下方格式條列回覆（每行一個路段）：\n起點 ➔ 終點：XX分鐘\n（例如：台北各大飯店 ➔ 日月潭遊湖：170分鐘）`;
+
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(promptText);
+        window.showToast('📋 已複製路段清單與 AI 提示詞！可直接貼至 ChatGPT 或 Gemini 查詢。');
+      } else {
+        const ta = document.createElement('textarea');
+        ta.value = promptText;
+        document.body.appendChild(ta);
+        ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        window.showToast('📋 已複製路段清單與 AI 提示詞！');
+      }
+    };
+
+    window.importRoutesFromTextPrompt = function() {
+      const input = prompt('請在此貼上 AI 代查好的車程文字清單：\n（格式範例：台北 ➔ 日月潭：170分鐘）');
+      if (!input || !input.trim()) return;
+
+      const lines = input.split(/\r?\n/);
+      const cache = window.loadRouteCache();
+      let importedCount = 0;
+
+      lines.forEach(line => {
+        const m = line.match(/(?:[0-9\.\-\*、\s]*Day\s*\d+[：:]\s*)?([^\➔\->:\uff1a]+)\s*(?:➔|->|至|到)\s*([^\➔\->:\uff1a]+)[：:]\s*([0-9]+)\s*(?:分鐘|分|min)?/i);
+        if (m) {
+          const from = m[1].trim().replace(/^[0-9\.\s]+/, '');
+          const to = m[2].trim();
+          const mins = parseInt(m[3], 10);
+          if (from && to && mins > 0) {
+            cache[`${from} -> ${to}`] = { minutes: mins, note: 'AI 貼上匯入' };
+            cache[`${to} -> ${from}`] = { minutes: mins, note: 'AI 貼上匯入' };
+            importedCount++;
+          }
+        }
+      });
+
+      if (importedCount > 0) {
+        window.saveRouteCache(cache);
+        window.performItineraryAuditAndRouteCheck();
+        window.showToast(`🎉 成功貼上並記住 ${importedCount} 條路段車程！`);
+      } else {
+        window.showToast('⚠️ 未辨識到符合格式的路段，請確認文字包含「起點 ➔ 終點：XX分鐘」');
+      }
+    };
+
+    window.aiBatchEstimateRoutes = async function() {
+      const segments = window.currentItinerarySegments || [];
+      if (segments.length === 0) {
+        window.showToast('⚠️ 目前尚無切分路段可供估算！');
+        return;
+      }
+
+      const cache = window.loadRouteCache();
+      const unknownSegments = segments.filter(seg => {
+        const k1 = `${seg.from} -> ${seg.to}`;
+        const k2 = `${seg.to} -> ${seg.from}`;
+        return !cache[k1] && !cache[k2];
+      });
+
+      if (unknownSegments.length === 0) {
+        window.showToast('✨ 所有路段均已記錄在車程庫中，無須重新估算！');
+        return;
+      }
+
+      let apiKey = localStorage.getItem('yxg_gemini_api_key');
+      if (!apiKey) {
+        apiKey = prompt('請輸入 Google Gemini API Key（若無，可改用「📋 複製路段清單」至外部查詢）：');
+        if (!apiKey || !apiKey.trim()) {
+          window.showToast('❌ 取消連線估算。建議使用「📋 複製路段清單」功能。');
+          return;
+        }
+        apiKey = apiKey.trim();
+        localStorage.setItem('yxg_gemini_api_key', apiKey);
+      }
+
+      window.showToast(`🧠 正在連線 AI 自動估算 ${unknownSegments.length} 段車程，請稍候...`);
+
+      const queryList = unknownSegments.map((s, i) => `${i + 1}. ${s.from} ➔ ${s.to}`).join('\n');
+      const prompt = `你是台灣包車旅遊專用車程估算系統。請評估以下各點對點路段（九人座商務車、台灣實際路況）合理單程行車時間（分鐘數）。
+請直接輸出 JSON 陣列，不要加入額外的 markdown 解釋：
+[
+  {"from": "起點", "to": "終點", "minutes": 170}
+]
+
+路段清單如下：
+${queryList}`;
+
+      try {
+        const candidateModels = ['gemini-2.5-flash', 'gemini-2.0-flash', 'gemini-flash-latest'];
+        let jsonStr = '';
+
+        for (const model of candidateModels) {
+          try {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'x-goog-api-key': apiKey },
+              body: JSON.stringify({
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                generationConfig: { temperature: 0.1 }
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+              if (text) {
+                jsonStr = text;
+                break;
+              }
+            }
+          } catch (_) {}
+        }
+
+        if (!jsonStr) {
+          throw new Error('AI 未能回傳資料，請改用「📋 複製路段清單」至網頁查詢。');
+        }
+
+        const cleaned = jsonStr.replace(/^```json/i, '').replace(/^```/i, '').replace(/```$/i, '').trim();
+        const results = JSON.parse(cleaned);
+        let updatedCount = 0;
+
+        if (Array.isArray(results)) {
+          results.forEach(item => {
+            if (item.from && item.to && Number(item.minutes) > 0) {
+              const mins = Number(item.minutes);
+              cache[`${item.from.trim()} -> ${item.to.trim()}`] = { minutes: mins, note: 'Gemini 自動估算' };
+              cache[`${item.to.trim()} -> ${item.from.trim()}`] = { minutes: mins, note: 'Gemini 自動估算' };
+              updatedCount++;
+            }
+          });
+        }
+
+        if (updatedCount > 0) {
+          window.saveRouteCache(cache);
+          window.performItineraryAuditAndRouteCheck();
+          window.showToast(`🎉 AI 自動估算完成！已自動記住 ${updatedCount} 個路段車程！`);
+        } else {
+          throw new Error('解析估算結果失敗');
+        }
+      } catch (err) {
+        console.warn('AI 自動估算受阻:', err);
+        window.showToast(`估算未完成（${err.message || ''}）。已為您切換至「複製路段」模式。`);
+        window.copyRoutesQueryPrompt();
+      }
+    };
+
+    window.handleWorkspaceInputChanged = function() {
+      window.renderIndependentPreorderUI();
+      window.recalculateLiveSummary();
+      window.performItineraryAuditAndRouteCheck();
+      window.renderBackendFlightCardUI();
+    };
+
+    // ==============================================================
+    // 智慧行程轉譯模組 (嚴格杜絕擅自覆蓋為台北各大飯店)
+    // ==============================================================
+    const spotTypoCorrections = {
+      '阿乾一芋頭球': '阿柑姨芋圓',
+      '阿乾一': '阿柑姨芋圓',
+      '阿甘姨': '阿柑姨芋圓',
+      '芋頭球': '阿柑姨芋圓',
+      '青天崗草原': '擎天崗草原',
+      '青天崗': '擎天崗草原',
+      '溫泉谷': '地熱谷',
+      '北投溫泉谷': '地熱谷',
+      '竹湖': '竹子湖',
+      '小油坑休閒區': '小油坑遊客中心',
+      '桃子/桃子海岸': '桃子海岸',
+      '桃子': '桃子海岸',
+      '勝興腳踏車': '勝興車站舊山線鐵道自行車',
+      '舊山線自行車': '勝興車站舊山線鐵道自行車',
+      '鐵道自行車': '勝興車站舊山線鐵道自行車',
+      '18度c': '18度C巧克力工房',
+      '巧克力工廠': '18度C巧克力工房'
+    };
+
+    /**
+     * 100% 忠實還原使用者輸入之出發起點與住宿飯店，絕不隨意預設或覆寫為「台北各大飯店」
+     */
+    window.parseRawTextLocally = function(rawText) {
+      if (!/^\s*(?:Day\s*\d+|第[一二三四五六七八九十\d]+天)(?:\s|$)/im.test(rawText)) return null;
+      const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      const currentYear = new Date().getFullYear();
+
+      // 1. 抓取日期
+      let startDateStr = '';
+      let endDateStr = '';
+
+      const sMatch = rawText.match(/包車開始日期[：:]\s*([0-9\/\-]+)/i) || rawText.match(/抵達日期[：:]\s*([0-9\/\-]+)/i);
+      if (sMatch) startDateStr = sMatch[1].replace(/-/g, '/');
+
+      const eMatch = rawText.match(/包車結束日期[：:]\s*([0-9\/\-]+)/i) || rawText.match(/送機日期[：:]\s*([0-9\/\-]+)/i);
+      if (eMatch) endDateStr = eMatch[1].replace(/-/g, '/');
+
+      if (!startDateStr || !endDateStr) {
+        const dateMatches = [...rawText.matchAll(/(?:20\d{2}[\/\-])?(\d{1,2})[\/\-月](\d{1,2})[日號]?/g)];
+        if (dateMatches.length >= 2) {
+          const m1 = dateMatches[0][1].padStart(2, '0');
+          const d1 = dateMatches[0][2].padStart(2, '0');
+          const m2 = dateMatches[dateMatches.length - 1][1].padStart(2, '0');
+          const d2 = dateMatches[dateMatches.length - 1][2].padStart(2, '0');
+          if (!startDateStr) startDateStr = `${currentYear}/${m1}/${d1}`;
+          if (!endDateStr) endDateStr = `${currentYear}/${m2}/${d2}`;
+        } else if (dateMatches.length === 1 && !startDateStr) {
+          const m1 = dateMatches[0][1].padStart(2, '0');
+          const d1 = dateMatches[0][2].padStart(2, '0');
+          startDateStr = `${currentYear}/${m1}/${d1}`;
+          endDateStr = `${currentYear}/${m1}/${d1}`;
+        }
+      }
+
+      if (!startDateStr || !endDateStr) return null;
+
+      // 2. 抓取預約代表與電話
+      let partyText = '貴賓 等共 4 人';
+      const rawParty = rawText.match(/預約代表[：:]\s*([^\r\n]+)/);
+      if (rawParty) {
+        partyText = rawParty[1].trim();
+      } else {
+        const nameMatch = rawText.match(/([^\s\d,，]{2,4})(?:先生|小姐|女士|哥|姐)?\s*(?:共|等共)?\s*(\d+)\s*(?:人|位|大)/);
+        if (nameMatch) {
+          partyText = `${nameMatch[1]} 等共 ${nameMatch[2]} 人`;
+        }
+      }
+
+      let phoneText = '';
+      const rawPhone = rawText.match(/聯絡電話[：:]\s*([^\r\n]+)/);
+      if (rawPhone && !/Day\s*1/i.test(rawPhone[1])) {
+        phoneText = rawPhone[1].trim();
+      }
+
+      // 3. 提取機場資訊
+      const { pickup, dropoff } = window.parseAirportPickupDropoffInfo(rawText);
+
+      // 4. 切割並解析天數
+      const daySections = {};
+      let currentDay = 1;
+      let inSpecificDay = false;
+
+      lines.forEach(line => {
+        const dayHeaderMatch = line.match(/(?:第([一二三四五六七八九十0-9]+)天|Day\s*(\d+)|D(\d+))/i);
+        if (dayHeaderMatch) {
+          inSpecificDay = true;
+          const rawNum = dayHeaderMatch[2] || dayHeaderMatch[3];
+          if (rawNum) {
+            currentDay = parseInt(rawNum, 10);
+          } else {
+            const zhMap = { '一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7, '八': 8, '九': 9, '十': 10 };
+            currentDay = zhMap[dayHeaderMatch[1]] || (parseInt(dayHeaderMatch[1], 10) || 1);
+          }
+          if (!daySections[currentDay]) {
+            daySections[currentDay] = { departure: '', departureTime: '', bookingTime: '', spots: [], hotel: '', fare: 0 };
+          }
+          return;
+        }
+
+        if (!daySections[currentDay]) {
+          daySections[currentDay] = { departure: '', departureTime: '', bookingTime: '', spots: [], hotel: '', fare: 0 };
+        }
+
+        const sec = daySections[currentDay];
+
+        // 偵測出發地點（包含出發起點、出發地）
+        const depMatch = line.match(/(?:出發地點|出發起點|起點|出發飯店|出發地)[：:]\s*([^\r\n]+)/i);
+        if (depMatch) {
+          const val = depMatch[1].trim();
+          if (val && !val.includes('台北各大飯店')) {
+            sec.departure = val;
+          }
+          return;
+        }
+
+        // 偵測出發時間
+        const bookingMatch = line.match(/^(?:勝興預約時間|預約時間)[：:]\s*(\d{1,2}:\d{2})/);
+        if (bookingMatch) { sec.bookingTime = bookingMatch[1]; return; }
+        const timeMatch = line.match(/^(?:出發時間|開車時間|時間)[：:]\s*([^\r\n]+)/i);
+        if (timeMatch && !line.includes('抵達時間') && !line.includes('起飛時間')) {
+          sec.departureTime = timeMatch[1].trim();
+          return;
+        }
+
+        // 偵測住宿飯店
+        const hotelMatch = line.match(/(?:住宿飯店|住宿酒店|當晚住宿飯店|當晚住宿酒店|飯店|酒店|住宿|入住|住)[：:]\s*([^\r\n]+)/i);
+        if (hotelMatch && !line.includes('自行車') && !line.includes('步道') && !line.includes('遊湖')) {
+          const val = hotelMatch[1].trim();
+          // 若有具體飯店（如嘉義樂客商旅），絕不可被模糊的台北各大飯店蓋過
+          if (val && (val !== '台北各大飯店' || !sec.hotel)) {
+            sec.hotel = val;
+          }
+          return;
+        }
+
+        // 偵測今日車資
+        const fareMatch = line.match(/(?:今日車資|當日車資|車資)[：:]\s*([0-9,]+)/i);
+        if (fareMatch) {
+          const f = parseInt(fareMatch[1].replace(/[^\d]/g, ''), 10) || 0;
+          if (f > 0) sec.fare = f;
+          return;
+        }
+
+        // 排除掉不屬於景點的非行程行
+        if (!/包車|預約代表|聯絡電話|接機|送機|航班|抵達|起飛|航廈|---|=|——|出發起點|出發地點|住宿飯店|今日車資/.test(line)) {
+          let cleanedSpot = line.replace(/^[0-9\.\-\*、\s]+/, '').replace(/^行程內容[：:]\s*/i, '').trim();
+          if (cleanedSpot && !cleanedSpot.includes('：')) {
+            sec.spots.push(spotTypoCorrections[cleanedSpot] || cleanedSpot);
+          }
+        }
+      });
+
+      // 組合格式
+      let output = `包車開始日期：${startDateStr}\n包車結束日期：${endDateStr}\n預約代表：${partyText}\n聯絡電話：${phoneText}\n\n`;
+
+      if (pickup) {
+        output += `接機資訊\n抵達日期：${pickup.date}\n航班編號：${pickup.flight}\n抵達時間：${pickup.time}\n抵達航廈：${pickup.terminal}\n接機地點：${pickup.location}\n\n`;
+      }
+
+      const dayKeys = Object.keys(daySections).map(Number).sort((a, b) => a - b);
+      if (dayKeys.length === 0) dayKeys.push(1);
+
+      dayKeys.forEach((d, idx) => {
+        const sec = daySections[d] || { departure: '', departureTime: '', bookingTime: '', spots: [], hotel: '', fare: 0 };
+
+        // 智慧保留出發地點：優先使用本天指定出發點；次之承接前一晚住宿；接機日預設為接機機場
+        let finalDeparture = sec.departure;
+        if (!finalDeparture || finalDeparture === '台北各大飯店') {
+          if (d === 1) {
+            finalDeparture = pickup ? pickup.location : (sec.departure || '待確認出發點');
+          } else {
+            const prevHotel = daySections[dayKeys[idx - 1]]?.hotel;
+            finalDeparture = (prevHotel && prevHotel !== '自理' && prevHotel !== '台北各大飯店') ? prevHotel : (sec.departure || '待確認出發點');
+          }
+        }
+
+        let finalDepartureTime = sec.departureTime;
+        if (!finalDepartureTime) {
+          finalDepartureTime = (d === 1 && pickup) ? '接機日' : '09:00';
+        }
+
+        let finalHotel = sec.hotel;
+        if (!finalHotel || finalHotel === '台北各大飯店') {
+          finalHotel = '待確認飯店';
+        }
+
+        const finalFare = sec.fare > 0 ? sec.fare : '待補';
+
+        output += `Day ${d}\n`;
+        output += `出發地點：${finalDeparture}\n`;
+        output += `出發時間：${finalDepartureTime}\n`;
+        output += `行程內容：\n`;
+        const spotsList = Array.from(new Set(sec.spots || []));
+        if (spotsList.length === 0) {
+          output += '行程待補\n';
+        } else {
+          spotsList.forEach(sp => {
+            output += `${sp}\n`;
+          });
+        }
+        if (sec.bookingTime) output += `勝興預約時間：${sec.bookingTime}\n`;
+        output += `住宿飯店：${finalHotel}\n`;
+        output += `今日車資：${finalFare}\n\n`;
+      });
+
+      if (dropoff) {
+        output += `送機資訊\n送機日期：${dropoff.date}\n起飛時間：${dropoff.time}\n航班編號：${dropoff.flight}\n出發航廈：${dropoff.terminal}\n`;
+      }
+
+      return output.trim();
+    };
+
+    window.cleanStandardItineraryText = function(text) {
+      if (!text) return '';
+      let cleaned = text;
+
+      cleaned = cleaned.replace(/預約代表[：:]\s*(?:貴賓\s*)?等共\s*(?:未提供)?\s*人/g, '預約代表：貴賓 等共 4 人');
+      cleaned = cleaned.replace(/預約代表[：:]\s*(?:\r?\n|$)/gm, '預約代表：貴賓 等共 4 人\n');
+      cleaned = cleaned.replace(/預約代表[：:]\s*$/gm, '預約代表：貴賓 等共 4 人');
+
+      cleaned = cleaned.replace(/^[ \t]*(?:客戶行程備註|備註)[：:][^\n]*(?:\r?\n|$)/gim, '');
+      cleaned = cleaned.replace(/(?:\r?\n){3,}/g, '\n\n');
+
+      return cleaned.trim();
+    };
+
+    window.convertRawTextToStandardWithGemini = async function() {
+      const textarea = document.getElementById('standard-text-workspace');
+      if (!textarea || !textarea.value.trim()) {
+        window.showToast('⚠️ 請先在輸入框貼上客人的原始訊息文字！');
+        return;
+      }
+
+      const rawText = textarea.value.trim();
+      let apiKey = localStorage.getItem('yxg_gemini_api_key');
+      window.showToast('🧠 正在啟動雙核智慧引擎分析文字與在地路線，請稍候...');
+
+      let formattedResult = null;
+
+      if (apiKey && apiKey.trim()) {
+        const currentYear = new Date().getFullYear();
+        const systemInstruction = `你是一位專業的台灣包車旅遊（原鄉谷包車旅遊）調度專員。
+將客人發送的文字，標準化重組成系統專用的標準文字行程格式：
+包車開始日期：YYYY/MM/DD
+包車結束日期：YYYY/MM/DD
+預約代表：陳先生 等共 4 人（若有指名則填寫「XX 等共 X 人」，若無則填寫「預約代表：貴賓 等共 4 人」）
+聯絡電話：電話號碼或留空
+（注意：嚴禁輸出「客戶行程備註：」或「備註：」欄位，完全不要輸出此行！）
+
+【極為重要絕對禁令】：
+1. 嚴禁無故覆寫為「台北各大飯店」！若客人原始文字中【已指定出發地點、出發起點、接機地點或住宿飯店】（例如：桃園機場、嘉義樂客商旅、阿里山園區、台中逢甲商旅等），請【務必 100% 嚴格保留原始填寫的地點與飯店名稱】，絕對不可擅自替換成「台北各大飯店」！
+2. 隔日出發延續：若第 N+1 天沒有特別註明出發點，則自動承接第 N 天當晚的住宿飯店作為出發地點（例如前晚住嘉義樂客商旅，隔天出發點即為嘉義樂客商旅）。
+3. 景點錯字校正：自動將「阿乾一」校正為「阿柑姨芋圓」、「青天崗」校正為「擎天崗草原」、「溫泉谷」校正為「地熱谷」。
+4. 「明年」應以今年 ${currentYear} 年推得 ${currentYear + 1} 年；日期只能由客人原文推得，絕不可產生不存在的月份或日期。
+5. 未提供的每日車資寫「待補」，總預算不可拆成每日車資；送機航班不可改成接機航班，預約時間僅在客人提供時保留。
+格式結構如下：
+
+Day 1
+出發地點：【嚴格填寫原始文字指定之出發起點或接機機場，切勿擅自寫台北各大飯店】
+出發時間：09:00（接機日填接機日）
+行程內容：
+景點A
+景點B
+住宿飯店：【嚴格填寫原始文字指定之當晚飯店（如嘉義樂客商旅），切勿擅自寫台北各大飯店】
+今日車資：待補`;
+
+        const candidateModels = [
+          'gemini-2.0-flash',
+          'gemini-1.5-flash',
+          'gemini-flash-latest'
+        ];
+
+        for (const model of candidateModels) {
+          try {
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(apiKey)}`;
+            const response = await fetch(endpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'x-goog-api-key': apiKey
+              },
+              body: JSON.stringify({
+                systemInstruction: { parts: [{ text: systemInstruction }] },
+                contents: [{ role: 'user', parts: [{ text: rawText }] }],
+                generationConfig: { temperature: 0.1 }
+              })
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              formattedResult = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+              if (formattedResult) break;
+            }
+          } catch (_) {}
+        }
+      }
+
+      if (!formattedResult) {
+        formattedResult = window.parseRawTextLocally(rawText);
+      }
+
+      if (formattedResult) {
+        formattedResult = formattedResult.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
+        formattedResult = window.cleanStandardItineraryText(formattedResult);
+        const review = window.YxgIntake.reviewConversion(rawText, formattedResult);
+        if (!review.ok) {
+          const message = `整理結果未通過檢查：${review.issues.join('、')}。原始文字已保留，請人工核對。`;
+          const status = document.getElementById('simple-intake-status');
+          if (status) status.textContent = message;
+          window.showToast(message, true);
+          return;
+        }
+        textarea.value = review.text;
+
+        window.renderIndependentPreorderUI();
+        window.recalculateLiveSummary();
+        window.performItineraryAuditAndRouteCheck();
+        window.renderBackendFlightCardUI();
+
+        const status = document.getElementById('simple-intake-status');
+        if (status) status.textContent = '整理完成；未提供的每日車資標示「待補」，請核對後填入。';
+        window.showToast('智慧整理完成，請核對待補車資與預約班次。');
+      } else {
+        const message = apiKey ? '整理失敗，請核對原文或稍後重試；原始文字已保留。' : '自由聊天文字需先設定整理功能的 Gemini Key；原始文字已保留。';
+        const status = document.getElementById('simple-intake-status');
+        if (status) status.textContent = message;
+        window.showToast(message, true);
+      }
+    };
+
+    const guideDictionary = {
+      confirmation: {
+        title: '📖 行程建立、稽核與車程指引',
+        subtitle: '標準行程輸入、健康度檢查與車程學習累積',
+        hasTemplates: true,
+        steps: [
+          { num: '1', strong: '貼入客人文字或範本', desc: '在工作區貼入對話，點擊「✨ 智慧一鍵轉標準格式」校正錯字與動線，完整保留自訂飯店。' },
+          { num: '2', strong: '檢查待補清單與車程', desc: '觀察上方評分條與待補卡片，針對缺漏（如住宿/電話）點擊補充。' },
+          { num: '3', strong: '學習並記住新車程', desc: '未記錄過的路段可點「🤖 AI 自動估算」一鍵全自動查詢並寫入庫存。' },
+          { num: '4', strong: '預檢並開啟生成器', desc: '步驟 2 填妥案件編號，一鍵直通米其林星鑰尊享行程手帖！' }
+        ]
+      },
+      overview: {
+        title: '📖 今日調度與行車監控',
+        subtitle: '掌握本日最新出車狀況、未收款項與連線狀態',
+        steps: [
+          { num: '1', strong: '今日出車狀態', desc: '確認今日出發司導是否已提前抵達迎候集合地點。' },
+          { num: '2', strong: '現場尾款追蹤', desc: '核對今日有收取現金尾款的行程案件，提醒司導收款。' },
+          { num: '3', strong: '未完工案件巡檢', desc: '巡檢進行中訂單，防止有無車輛狀況。' },
+          { num: '4', strong: '生成器核心就緒', desc: '確認右側生成器就緒狀態，隨時可進行新訂單交付。' }
+        ]
+      },
+      orders: {
+        title: '📖 訂單管理與司導調度',
+        subtitle: '已登記訂單瀏覽、司導指派與行程重新載入',
+        steps: [
+          { num: '1', strong: '檢視案件清單', desc: '瀏覽所有已登記之多日或單日包車行程卡片。' },
+          { num: '2', strong: '指派/更換司導', desc: '確認行程由合適司導執勤並核實座駕車號規格。' },
+          { num: '3', strong: '帶入工作區重新修訂', desc: '點擊「📤 帶入工作區」可將既有行程文字重新載入並修改。' },
+          { num: '4', strong: '雙端交付確認', desc: '生成符合米其林星鑰標準的客戶端手帖與司導任務單。' }
+        ]
+      },
+      finance: {
+        title: '📖 帳務拆帳與結算指南',
+        subtitle: '現場收款、公司10%派遣費、代訂歸公司與結算沖銷',
+        steps: [
+          { num: '1', strong: '現場乘客收款公式', desc: '現場現金 ＝ 車資總額 ＋ 代訂費用（門票/房費） － 已付定金。' },
+          { num: '2', strong: '代訂費用歸屬公司', desc: '門票與飯店皆由公司全額墊款，司導現場代收後全額繳回公司。' },
+          { num: '3', strong: '10%派遣費與司導90%', desc: '公司收取車資總額之 10% 派遣費；司導實得車資的 90%。' },
+          { num: '4', strong: '司導完工繳回計算', desc: '司導應繳回 ＝ 現場收款 － (車資總額 × 90% 司導實得)。' }
+        ]
+      },
+      places: {
+        title: '📖 景點資料庫維護指南',
+        subtitle: '全台熱門包車景點停留時間與叮嚀文字庫',
+        steps: [
+          { num: '1', strong: '展開／收合卡片', desc: '點擊景點標題可展開或收合卡片，檢視目前設定的資訊。' },
+          { num: '2', strong: '編輯停留時間與介紹', desc: '展開卡片後直接在輸入框內修改建議停留時間、簡介與注意事項。' },
+          { num: '3', strong: '儲存或新增自訂景點', desc: '點擊卡片內的「💾 儲存修改」即完成修改，或點右上角新增景點。' },
+          { num: '4', strong: '生成器智慧連動', desc: '此處資料將即時作為行程生成器自動計算抵達與集合時間之基準。' }
+        ]
+      },
+      settings: {
+        title: '📖 系統環境與連線設定',
+        subtitle: '正式生成器檔案路徑指定與預設出發參數',
+        steps: [
+          { num: '1', strong: '確認生成器檔名', desc: '請將 v1.6.79 生成器與後台放在同一資料夾。' },
+          { num: '2', strong: '點擊測試開啟', desc: '點擊「🧪 測試開啟生成器」驗證瀏覽器新分頁連線順暢。' },
+          { num: '3', strong: '固定出發時間', desc: '系統預設每日出發時間為 09:00（接機日依抵達時間 +1hr 順延）。' },
+          { num: '4', strong: '公司收款帳號', desc: '維護代收結算繳回之銀行帳號，即時連動對帳單。' }
+        ]
+      },
+      other: {
+        title: '📖 公開官網內容發布指引',
+        subtitle: '原鄉谷包車旅遊公開精選行程官方網站維護與管理',
+        steps: [
+          { num: '1', strong: '前往官方網站', desc: '點擊右上角按鈕在新分頁開啟公開精選行程網站。' },
+          { num: '2', strong: '編輯品牌宣傳標語', desc: '可自由修改中文標語、英文標語與客服諮詢聯絡電話。' },
+          { num: '3', strong: '維護精選包車推薦', desc: '直接修改首頁展示之推薦路線清單（如阿里山、日月潭等）。' },
+          { num: '4', strong: '一鍵儲存設定', desc: '點擊下方「💾 儲存網站設定」，即時保存發布內容！' }
+        ]
+      }
+    };
+
+    window.renderGuideForPanel = function(panelId) {
+      const guideData = guideDictionary[panelId] || guideDictionary.confirmation;
+      const titleEl = document.getElementById('guide-title');
+      const subEl = document.getElementById('guide-subtitle');
+      const listEl = document.getElementById('guide-steps-list');
+
+      if (titleEl) titleEl.textContent = guideData.title;
+      if (subEl) subEl.textContent = guideData.subtitle;
+
+      if (listEl) {
+        listEl.innerHTML = guideData.steps.map(s => `
+          <div class="guide-step">
+            <b>${s.num}</b>
+            <div class="guide-step-body">
+              <strong>${s.strong}</strong>
+              <span>${s.desc}</span>
+            </div>
+          </div>
+        `).join('');
+      }
+    };
+
+    window.showToast = function(msg) {
+      const toast = document.getElementById('toast');
+      if (toast) {
+        toast.textContent = msg;
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 3000);
+      }
+    };
+
+    window.clearWorkspaceInput = function() {
+      const workspace = document.getElementById('standard-text-workspace');
+      if (workspace) workspace.value = '';
+      const caseInput = document.getElementById('dispatch-finance-case-id');
+      if (caseInput) caseInput.value = '';
+      const depositInput = document.getElementById('booking-deposit');
+      if (depositInput) depositInput.value = '0';
+      try {
+        sessionStorage.removeItem('yxg_handoff_case_id');
+        sessionStorage.removeItem('yxg-text-workspace-draft-v1');
+        localStorage.removeItem('yxg_handoff_case_id');
+        localStorage.removeItem('yxg-text-workspace-draft-v1');
+      } catch (_) {}
+      window.updateOutputPreview('');
+      window.renderIndependentPreorderUI();
+      window.performItineraryAuditAndRouteCheck();
+      window.renderBackendFlightCardUI();
+      window.showToast('🧹 已清空工作區文字與案件編號！');
+    };
+
+    window.syncDepositToWorkspace = function(value) {
+      const textarea = document.getElementById('standard-text-workspace');
+      if (!textarea) return;
+      const deposit = Math.max(0, Math.floor(Number(value) || 0));
+      const linePattern = /^\s*已收(?:訂金|定金)\s*[：:]\s*[^\n]*\n?/gmi;
+      let text = textarea.value.replace(linePattern, '').replace(/\n{3,}/g, '\n\n').trim();
+      text = `${text}${text ? '\n' : ''}已收定金：${deposit}`;
+      textarea.value = text;
+      window.recalculateLiveSummary();
+    };
+
+    window.updateOutputPreview = function(val) {
+      const caseId = (val || '').trim();
+      const preview = document.getElementById('output-preview');
+      if (!preview) return;
+      if (!caseId) {
+        preview.textContent = '未填案件編號時，系統將依出發日期自動產生並帶入生成器。';
+        preview.style.color = 'var(--ink-sub)';
+      } else {
+        preview.textContent = `將建立：網頁備份\\2026_${caseId}\\（客戶專屬手帖 ＋ 司導任務單.html）`;
+        preview.style.color = 'var(--gold-deep)';
+      }
+    };
+
+    window.parseAllSpotsAndHotels = function(text) {
+      if (!text) return { spots: [], hotels: [] };
+      const spots = new Set();
+      const hotels = new Set();
+      const dayBlocks = text.split(/Day\s*\d+/i);
+      dayBlocks.forEach(block => {
+        const lines = block.split('\n').map(l => l.trim()).filter(Boolean);
+        let inContent = false;
+        lines.forEach(line => {
+          if (/^行程內容[：:]?/i.test(line)) { inContent = true; return; }
+          if (/^(?:勝興預約時間|預約時間)[：:]/.test(line)) return;
+          if (/^(?:住宿飯店|當晚住宿飯店|住宿酒店|飯店|酒店|住宿|今日車資|出發地點|出發時間)[：:]/i.test(line)) {
+            if (/^(?:住宿飯店|當晚住宿飯店|住宿酒店|飯店|酒店|住宿)[：:]/i.test(line)) {
+              const h = line.replace(/^(?:住宿飯店|當晚住宿飯店|住宿酒店|飯店|酒店|住宿)[：:]/i, '').trim();
+              if (h && h !== '自理' && h !== '台北各大飯店') hotels.add(h);
+            }
+            inContent = false;
+            return;
+          }
+          if (inContent) {
+            if (line && line !== '行程內容' && !line.includes('→')) spots.add(line);
+          }
+        });
+      });
+      const hotelMatches = text.matchAll(/(?:住宿飯店|當晚住宿飯店|住宿酒店|飯店|酒店|住宿)[：:]\s*([^\n]+)/gi);
+      for (const m of hotelMatches) {
+        const h = m[1].trim();
+        if (h && h !== '自理' && h !== '台北各大飯店') hotels.add(h);
+      }
+      return { spots: Array.from(spots), hotels: Array.from(hotels) };
+    };
+
+    window.renderIndependentPreorderUI = function() {
+      const container = document.getElementById('independent-preorder-container');
+      const textarea = document.getElementById('standard-text-workspace');
+      if (!container || !textarea) return;
+
+      const { spots, hotels } = window.parseAllSpotsAndHotels(textarea.value);
+      let html = '';
+      const qualifiedSpots = [...new Set(spots.filter(s => /勝興.*(?:鐵(?:道|路)自行車|腳踏(?:火車|車))|舊山線.*自行車|鐵(?:道|路)自行車/.test(s)).map(() => '勝興鐵路自行車'))];
+
+      Object.keys(window.itemPricingState).forEach(k => {
+        if (k.startsWith('spot_')) {
+          const isStillQualified = qualifiedSpots.some(spot => k.startsWith(`spot_${spot}_`));
+          if (!isStillQualified) delete window.itemPricingState[k];
+        }
+      });
+
+      if (qualifiedSpots.length === 0 && hotels.length === 0) {
+        container.innerHTML = '<div class="empty" style="padding:14px; font-size:0.8rem;">目前無符合之代訂項目（僅於行程出現「勝興鐵道自行車」或「住宿飯店」時啟動獨立代訂）。</div>';
+        return;
+      }
+
+      if (qualifiedSpots.length > 0) {
+        html += '<div style="font-size:0.82rem; font-weight:800; color:var(--gold-deep); margin-bottom:6px;">🎫 勝興鐵路自行車票券報價（須先預約班次）：</div>';
+        qualifiedSpots.forEach(spot => {
+          ['adult', 'child'].forEach(type => {
+            const key = `spot_${spot}_${type}`;
+            const isAdult = type === 'adult';
+            if (!window.itemPricingState[key]) {
+              window.itemPricingState[key] = {
+                name: `${spot}${isAdult ? '全票' : '孩童票'}`,
+                price: isAdult ? 285 : 230,
+                qty: 0,
+                checked: false
+              };
+            }
+            const state = window.itemPricingState[key];
+            const subtotal = (Number(state.price) || 0) * (Number(state.qty) || 1);
+            html += `
+              <div class="preorder-item-card" style="${state.checked ? '' : 'opacity:0.65; background:#FAF8F5;'}">
+                <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.86rem; font-weight:800; color:var(--ink-black);">
+                  <input type="checkbox" ${state.checked ? 'checked' : ''} onchange="window.toggleItemCheck('${key}', this.checked)" style="width:16px; height:16px;">
+                  <span>📍 景點：${spot} (${isAdult ? '全票 285元' : '孩童票 230元'})</span>
+                </label>
+                <div class="preorder-grid">
+                  <div><label>項目名稱</label><input type="text" value="${state.name}" oninput="window.updateItemField('${key}', 'name', this.value)"></div>
+                  <div><label>單價 ($)</label><input type="number" value="${state.price}" min="0" oninput="window.updateItemField('${key}', 'price', this.value)"></div>
+                  <div><label>數量</label><input type="number" value="${state.qty}" min="0" oninput="window.updateItemField('${key}', 'qty', this.value)"></div>
+                </div>
+                <div class="subtotal-tag">小計：$${subtotal.toLocaleString()}</div>
+              </div>
+            `;
+          });
+        });
+      }
+
+      if (hotels.length > 0) {
+        html += '<div style="font-size:0.82rem; font-weight:800; color:var(--gold-deep); margin:12px 0 6px;">🏨 各住宿飯店房費代訂（預設不勾選）：</div>';
+        hotels.forEach(hotel => {
+          const key = `hotel_${hotel}`;
+          if (!window.itemPricingState[key]) {
+            window.itemPricingState[key] = { name: `${hotel}房費`, price: 2800, qty: 0, checked: false };
+          }
+          const state = window.itemPricingState[key];
+          const subtotal = (Number(state.price) || 0) * (Number(state.qty) || 1);
+          html += `
+            <div class="preorder-item-card" style="${state.checked ? '' : 'opacity:0.65; background:#FAF8F5;'}">
+              <label style="display:flex; align-items:center; gap:8px; cursor:pointer; font-size:0.86rem; font-weight:800; color:var(--ink-black);">
+                <input type="checkbox" ${state.checked ? 'checked' : ''} onchange="window.toggleItemCheck('${key}', this.checked)" style="width:16px; height:16px;">
+                <span>🏨 飯店：${hotel} (預設不勾選)</span>
+              </label>
+              <div class="preorder-grid">
+                <div><label>項目名稱</label><input type="text" value="${state.name}" oninput="window.updateItemField('${key}', 'name', this.value)"></div>
+                <div><label>單價 ($)</label><input type="number" value="${state.price}" min="0" oninput="window.updateItemField('${key}', 'price', this.value)"></div>
+                <div><label>數量</label><input type="number" value="${state.qty}" min="0" oninput="window.updateItemField('${key}', 'qty', this.value)"></div>
+              </div>
+              <div class="subtotal-tag">小計：$${subtotal.toLocaleString()}</div>
+            </div>
+          `;
+        });
+      }
+      container.innerHTML = html;
+    };
+
+    window.toggleItemCheck = function(key, checked) {
+      if (window.itemPricingState[key]) {
+        window.itemPricingState[key].checked = checked;
+        if (checked && Number(window.itemPricingState[key].qty) <= 0) window.itemPricingState[key].qty = 1;
+        window.renderIndependentPreorderUI();
+        window.recalculateLiveSummary();
+      }
+    };
+
+    window.updateItemField = function(key, field, val) {
+      if (window.itemPricingState[key]) {
+        window.itemPricingState[key][field] = val;
+        window.renderIndependentPreorderUI();
+        window.recalculateLiveSummary();
+      }
+    };
+
+    // ==============================================================
+    // 🚀 開啟生成器：全量同步點對點車程資料庫至生成器
+    // ==============================================================
+    window.openSelectedGenerator = function() {
+      const textarea = document.getElementById('standard-text-workspace');
+      const caseInput = document.getElementById('dispatch-finance-case-id');
+      const caseId = (caseInput?.value || '').trim();
+
+      if (!caseId) {
+        window.showToast('⚠️ 【防呆提示】尚未輸入案件編號！請在步驟 2 填寫案件編號。');
+        caseInput?.focus();
+        return;
+      }
+
+      let text = textarea ? textarea.value.trim() : '';
+      text = window.cleanStandardItineraryText(text);
+
+      const carMatches = text.matchAll(/(?:今日車資|車資)[：:]\s*([0-9,]+)/g);
+      let calculatedTotalFare = 0;
+      for (const cm of carMatches) {
+        calculatedTotalFare += parseInt(cm[1].replace(/[^\d]/g, ''), 10) || 0;
+      }
+      if (calculatedTotalFare > 0 && !/總車資[：:]/.test(text)) {
+        text = `總車資：${calculatedTotalFare}\n${text}`;
+      }
+
+      const depositInput = document.getElementById('booking-deposit');
+      const depositVal = parseInt(depositInput?.value, 10) || 0;
+      if (depositVal >= 0 && !/已收[訂定]金[：:]/.test(text)) {
+        text = `${text}\n已收定金：${depositVal}`;
+      }
+
+      let preorderLines = [];
+      Object.values(window.itemPricingState).forEach(state => {
+        if (state.checked && Number(state.price) > 0 && Number(state.qty) > 0) {
+          const sub = (Number(state.price) || 0) * (Number(state.qty) || 1);
+          if (state.name.includes('房費') || state.name.includes('飯店')) {
+            preorderLines.push(`代訂酒店房費：${state.name}｜房費 ${state.price} 元 × ${state.qty} 間＝${sub} 元`);
+          } else {
+            preorderLines.push(`代訂票券：${state.name}｜單價 ${state.price} 元 × ${state.qty}＝${sub} 元`);
+          }
+        }
+      });
+
+      if (preorderLines.length > 0) {
+        text = `${text}\n${preorderLines.join('\n')}`;
+      }
+
+      // 將後台點對點車程資料庫完整打包注入生成器儲存庫
+      const currentRouteCache = window.loadRouteCache ? window.loadRouteCache() : {};
+      const routesListForSync = [];
+      Object.entries(currentRouteCache).forEach(([key, val]) => {
+        const parts = key.split(' -> ');
+        if (parts.length === 2 && val && val.minutes > 0) {
+          routesListForSync.push({
+            from: parts[0].trim(),
+            to: parts[1].trim(),
+            mins: Number(val.minutes),
+            label: `車程約 ${val.minutes} 分鐘`
+          });
+        }
+      });
+
+      try {
+        sessionStorage.setItem('yxg_handoff_case_id', caseId);
+        sessionStorage.setItem('yxg-text-workspace-draft-v1', text);
+        localStorage.setItem('yxg_handoff_case_id', caseId);
+        localStorage.setItem('yxg-text-workspace-draft-v1', text);
+
+        // 同步寫入生成器專用的車程資料庫鍵 (品牌獨立)
+        localStorage.setItem('yxg-confirmed-drive-times-v1', JSON.stringify(routesListForSync));
+        sessionStorage.setItem('yxg-confirmed-drive-times-v1', JSON.stringify(routesListForSync));
+      } catch (_) {}
+
+      const sysSettings = window.loadSystemSettings ? window.loadSystemSettings() : {};
+      let targetUrl = document.getElementById('generator-path')?.value.trim() || sysSettings.generatorPath || defaultGeneratorFileName;
+      
+      targetUrl = targetUrl.trim();
+      if (targetUrl && !targetUrl.toLowerCase().endsWith('.html') && !targetUrl.toLowerCase().endsWith('.htm')) {
+        targetUrl += '.html';
+      }
+      
+      const fullLaunchUrl = `${targetUrl}?caseId=${encodeURIComponent(caseId)}&t=${Date.now()}`;
+      let win = null;
+      try {
+        win = window.open(fullLaunchUrl, '_blank');
+      } catch (err) {
+        console.warn('開啟新分頁受限：', err);
+      }
+
+      if (!win || win.closed || typeof win.closed === 'undefined') {
+        const toast = document.getElementById('toast');
+        if (toast) {
+          toast.innerHTML = `⚠️ 瀏覽器攔截自動開啟！請<a href="${fullLaunchUrl}" target="_blank" style="color:#DFBE7A; text-decoration:underline; font-weight:900; margin-left:6px;">【點擊這裡手動開啟原鄉谷生成器】</a>`;
+          toast.classList.add('show');
+          setTimeout(() => toast.classList.remove('show'), 8000);
+        }
+      } else {
+        window.showToast(`✨ 已成功連線並開啟 原鄉谷包車旅遊 行程生成器（案件 #${caseId}，已同步 ${routesListForSync.length} 段車程）！`);
+      }
+    };
+
+    window.preflightAndOpenGenerator = function() {
+      window.openSelectedGenerator();
+    };
+
+    const PLACES_STORAGE_KEY = 'yxg-places-database-v1';
+    const defaultPlacesDatabase = [
+      { id: 'place_railbike', name: '勝興車站舊山線鐵道自行車', region: '中部（苗栗三義）', stayMinutes: 90, description: '穿梭舊山線百年隧道群，凌空俯瞰龍騰斷橋歷史殘跡與山城絕景。', notice: '請提前 30 分鐘報到取票並參加行前安全講習。' },
+      { id: 'place_sunmoonlake', name: '日月潭遊湖', region: '中部（南投魚池）', stayMinutes: 150, description: '全程搭乘豪華遊艇穿梭水社、玄光寺與伊達邵三大碼頭，坐擁雙潭湖光山色。', notice: '搭船請隨身攜帶船票，各碼頭均可自由上岸遊覽後再搭乘下一班船。' },
+      { id: 'place_qingjing', name: '清境農場（青青草原與觀山牧區）', region: '高山（南投仁愛）', stayMinutes: 160, description: '海拔千餘米雲霧繚繞之高山草原，漫遊木棧道，享受清新純淨負離子。', notice: '海拔 1,750 公尺紫外線強烈，請隨身攜帶遮陽帽子、薄外套與飲用水。' },
+      { id: 'place_alishan', name: '阿里山國家森林遊樂區', region: '南部（嘉義阿里山）', stayMinutes: 180, description: '漫步神木群棧道、姊妹潭與日出勝地，享受天然檜木芬多精。', notice: '山區氣溫偏低且步道階梯多，請穿著防滑好走球鞋並攜帶保暖外套。' },
+      { id: 'place_jiufen', name: '九份山城老街', region: '北部（新北瑞芳）', stayMinutes: 90, description: '漫步山城石階小徑，品嚐芋圓美味並遠眺山海一色夜景。', notice: '老街山路階梯多，車輛於九份停車場停靠後步行進入老街。' }
+    ];
+
+    window.loadPlacesData = function() {
+      try {
+        const saved = localStorage.getItem(PLACES_STORAGE_KEY);
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (_) {}
+      return [...defaultPlacesDatabase];
+    };
+
+    window.savePlacesData = function(list) {
+      try { localStorage.setItem(PLACES_STORAGE_KEY, JSON.stringify(list)); } catch (_) {}
+    };
+
+    window.renderPlacesListUI = function() {
+      const container = document.getElementById('places-accordion-list');
+      if (!container) return;
+      const list = window.loadPlacesData();
+      container.innerHTML = list.map((item, index) => {
+        const cardId = `place-card-${index}`;
+        return `
+          <div class="place-accordion-card" id="${cardId}">
+            <div class="place-accordion-header" onclick="window.togglePlaceCard('${cardId}')">
+              <h4>
+                <span>📍</span>
+                <span>${item.name}</span>
+                <span style="font-size:0.7rem; font-weight:800; background:var(--gold-light); color:var(--gold-deep); padding:2px 8px; border-radius:999px; border:1px solid #DFCFAE;">${item.region || '未分區'}</span>
+              </h4>
+              <div class="place-accordion-meta">
+                <span>⏱️ 停留：${item.stayMinutes} 分鐘</span>
+                <span class="toggle-icon">▼</span>
+              </div>
+            </div>
+            <div class="place-accordion-content">
+              <div class="edit-form-grid">
+                <div class="edit-field"><label>景點名稱：</label><input type="text" id="place-name-${index}" value="${item.name}"></div>
+                <div class="edit-field"><label>所屬分區：</label><input type="text" id="place-region-${index}" value="${item.region || ''}"></div>
+                <div class="edit-field"><label>建議停留時間（分鐘）：</label><input type="number" id="place-time-${index}" value="${item.stayMinutes}" min="10" step="5"></div>
+              </div>
+              <div class="edit-field" style="margin-bottom:10px;"><label>景點詳細特色與導覽簡介：</label><textarea id="place-desc-${index}" rows="2">${item.description || ''}</textarea></div>
+              <div class="edit-field"><label>司導叮嚀／參觀備註：</label><textarea id="place-notice-${index}" rows="2">${item.notice || ''}</textarea></div>
+              <div class="edit-actions">
+                <button type="button" class="button small danger" onclick="window.deletePlaceItem(${index})">🗑️ 刪除此景點</button>
+                <button type="button" class="button small primary" onclick="window.savePlaceItem(${index})">💾 儲存修改</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    };
+
+    window.togglePlaceCard = function(cardId) {
+      document.getElementById(cardId)?.classList.toggle('open');
+    };
+
+    window.toggleAllPlaces = function(expand) {
+      document.querySelectorAll('.place-accordion-card').forEach(c => {
+        if (expand) c.classList.add('open');
+        else c.classList.remove('open');
+      });
+      window.showToast(expand ? '⊞ 已展開所有景點介紹' : '⊟ 已收合所有景點介紹');
+    };
+
+    window.savePlaceItem = function(index) {
+      const list = window.loadPlacesData();
+      if (!list[index]) return;
+      list[index].name = document.getElementById(`place-name-${index}`)?.value.trim() || list[index].name;
+      list[index].region = document.getElementById(`place-region-${index}`)?.value.trim() || list[index].region;
+      list[index].stayMinutes = Number(document.getElementById(`place-time-${index}`)?.value) || list[index].stayMinutes;
+      list[index].description = document.getElementById(`place-desc-${index}`)?.value.trim() || '';
+      list[index].notice = document.getElementById(`place-notice-${index}`)?.value.trim() || '';
+      window.savePlacesData(list);
+      window.renderPlacesListUI();
+      window.showToast(`💾 已成功儲存「${list[index].name}」！`);
+    };
+
+    window.deletePlaceItem = function(index) {
+      const list = window.loadPlacesData();
+      if (!list[index]) return;
+      const removedName = list[index].name;
+      list.splice(index, 1);
+      window.savePlacesData(list);
+      window.renderPlacesListUI();
+      window.showToast(`🗑️ 已刪除景點「${removedName}」！`);
+    };
+
+    window.addNewPlacePrompt = function() {
+      const newName = prompt('請輸入欲新增的景點名稱：');
+      if (!newName || !newName.trim()) return;
+      const newTime = prompt('請輸入建議停留時間（分鐘）：', '60');
+      const list = window.loadPlacesData();
+      list.unshift({
+        id: `custom_${Date.now()}`,
+        name: newName.trim(),
+        region: '自訂精選',
+        stayMinutes: Number(newTime) || 60,
+        description: `自訂精選景點：${newName.trim()}。`,
+        notice: '請留意現場路況與停車規定。'
+      });
+      window.savePlacesData(list);
+      window.renderPlacesListUI();
+      window.showToast(`✨ 已新增「${newName.trim()}」！`);
+    };
+
+    window.resetPlacesToDefault = function() {
+      try { localStorage.removeItem(PLACES_STORAGE_KEY); } catch (_) {}
+      window.renderPlacesListUI();
+      window.showToast('↻ 已還原預設景點資料庫！');
+    };
+
+    const financeRecordsDatabase = [];
+
+    window.onFinanceFilterChange = function() {
+      const mode = document.getElementById('finance-filter-mode')?.value || 'driver';
+      const driverBox = document.getElementById('filter-driver-box');
+      const monthBox = document.getElementById('filter-month-box');
+      const daterangeBox = document.getElementById('filter-daterange-box');
+
+      if (mode === 'monthly') {
+        if (driverBox) driverBox.style.display = 'none';
+        if (monthBox) monthBox.style.display = 'block';
+        if (daterangeBox) daterangeBox.style.display = 'none';
+      } else if (mode === 'driver') {
+        if (driverBox) driverBox.style.display = 'block';
+        if (monthBox) monthBox.style.display = 'none';
+        if (daterangeBox) daterangeBox.style.display = 'flex';
+      } else {
+        if (driverBox) driverBox.style.display = 'none';
+        if (monthBox) monthBox.style.display = 'none';
+        if (daterangeBox) daterangeBox.style.display = 'flex';
+      }
+      window.renderFinanceTableUI();
+    };
+
+    window.renderFinanceTableUI = function() {
+      const mode = document.getElementById('finance-filter-mode')?.value || 'driver';
+      const selectedDriver = document.getElementById('finance-filter-driver')?.value || 'all';
+      const selectedMonth = document.getElementById('finance-filter-month')?.value || '2026-08';
+      const startDate = document.getElementById('finance-filter-start')?.value || '2026-08-01';
+      const endDate = document.getElementById('finance-filter-end')?.value || '2026-09-30';
+
+      let filtered = [...(window.getFinanceRecords?.() || financeRecordsDatabase)];
+      if (mode === 'monthly') filtered = filtered.filter(item => item.date.startsWith(selectedMonth));
+      else if (mode === 'driver') {
+        if (selectedDriver !== 'all') filtered = filtered.filter(item => item.driver === selectedDriver);
+        filtered = filtered.filter(item => item.date >= startDate && item.date <= endDate);
+      } else filtered = filtered.filter(item => item.date >= startDate && item.date <= endDate);
+
+      let sumCarFare = 0, sumPreorder = 0, sumCompanyFee = 0, sumDriverRemit = 0;
+      const tbody = document.getElementById('finance-table-body');
+      if (!tbody) return;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" class="empty" style="padding:24px; text-align:center; font-size:0.75rem;">此篩選條件下查無相關行程帳務記錄。</td></tr>`;
+      } else {
+        tbody.innerHTML = filtered.map(row => {
+          const fare = Number(row.carFare) || 0;
+          const preorder = Number(row.preorderItems) || 0;
+          const deposit = Number(row.deposit) || 0;
+          const onSiteCash = fare + preorder - deposit;
+          const driverNetIncome = Math.round(fare * 0.9);
+          const companyCut = Math.round(fare * 0.1);
+          const driverMustRemit = onSiteCash - driverNetIncome;
+
+          sumCarFare += fare;
+          sumPreorder += preorder;
+          sumCompanyFee += companyCut;
+          sumDriverRemit += (row.status === 'settled' ? 0 : driverMustRemit);
+
+          let statusTag = row.status === 'settled' 
+            ? '<span style="background:var(--gold-light); color:var(--gold-deep); padding:2px 6px; border-radius:99px; font-size:0.65rem; font-weight:800; border:1px solid #DFCFAE; white-space:nowrap;">已結清 ✓</span>'
+            : '<span style="background:#FFFBEB; color:#92400E; padding:2px 6px; border-radius:999px; font-size:0.65rem; font-weight:800; border:1px solid #FDE68A; white-space:nowrap;">待繳回 ⏳</span>';
+
+          return `
+            <tr style="border-bottom:1px solid var(--border-gilded); font-size:0.71rem;">
+              <td style="padding:6px 4px; font-weight:800; font-family:'Cinzel', serif; white-space:nowrap;">#${row.caseId}</td>
+              <td style="padding:6px 4px; white-space:nowrap;"><b>${row.driver}</b> <span style="font-size:0.66rem; color:var(--ink-sub);">(${row.plate})</span></td>
+              <td style="padding:6px 4px; font-size:0.68rem; color:var(--ink-sub); font-family:'Plus Jakarta Sans', sans-serif; white-space:nowrap;">${row.date}</td>
+              <td style="padding:6px 4px; text-align:right; font-weight:700; white-space:nowrap;">$${fare.toLocaleString()}</td>
+              <td style="padding:6px 4px; text-align:right; color:var(--gold-deep); font-weight:700; white-space:nowrap;">$${preorder.toLocaleString()}</td>
+              <td style="padding:6px 4px; text-align:right; color:var(--ink-black); white-space:nowrap;">-$${deposit.toLocaleString()}</td>
+              <td style="padding:6px 4px; text-align:right; font-weight:800; color:var(--burgundy-seal); white-space:nowrap;">$${onSiteCash.toLocaleString()}</td>
+              <td style="padding:6px 4px; text-align:right; font-weight:900; color:var(--burgundy-seal); white-space:nowrap;">$${driverMustRemit.toLocaleString()}</td>
+              <td style="padding:6px 4px; text-align:center;">${statusTag}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('kpi-total-fare').textContent = `$${sumCarFare.toLocaleString()}`;
+      document.getElementById('kpi-total-preorder').textContent = `$${sumPreorder.toLocaleString()}`;
+      document.getElementById('kpi-company-fee').textContent = `$${sumCompanyFee.toLocaleString()}`;
+      document.getElementById('kpi-driver-remit').textContent = `$${sumDriverRemit.toLocaleString()}`;
+      document.getElementById('finance-table-count').textContent = `共 ${filtered.length} 筆行程對帳記錄`;
+    };
+
+    window.resetFinanceFilters = function() {
+      document.getElementById('finance-filter-mode').value = 'driver';
+      document.getElementById('finance-filter-driver').value = 'all';
+      document.getElementById('finance-filter-start').value = '2026-08-01';
+      document.getElementById('finance-filter-end').value = '2026-09-30';
+      window.onFinanceFilterChange();
+      window.showToast('↻ 已重置帳務篩選條件！');
+    };
+
+    let workspaceDirectoryHandle = null;
+    const workspaceDbName = 'yxg-backend-workspace-v1';
+    const workspaceStoreName = 'handles';
+    const workspaceKey = 'selected-workspace';
+
+    function openWorkspaceDb() {
+      return new Promise((resolve, reject) => {
+        if (!window.indexedDB) { reject(new Error('IndexedDB not supported')); return; }
+        const req = indexedDB.open(workspaceDbName, 1);
+        req.onupgradeneeded = () => req.result.createObjectStore(workspaceStoreName);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error);
+      });
+    }
+
+    async function persistWorkspaceHandle(handle) {
+      try {
+        const db = await openWorkspaceDb();
+        const tx = db.transaction(workspaceStoreName, 'readwrite');
+        tx.objectStore(workspaceStoreName).put(handle, workspaceKey);
+        tx.oncomplete = () => db.close();
+      } catch (_) {}
+      try { localStorage.setItem('yxg_workspace_folder_name', handle.name || '原鄉谷包車旅遊'); } catch (_) {}
+    }
+
+    async function restoreWorkspaceDirectoryHandle() {
+      try {
+        const db = await openWorkspaceDb();
+        const handle = await new Promise((resolve, reject) => {
+          const tx = db.transaction(workspaceStoreName, 'readonly');
+          const req = tx.objectStore(workspaceStoreName).get(workspaceKey);
+          req.onsuccess = () => resolve(req.result || null);
+          req.onerror = () => reject(req.error);
+        });
+        db.close();
+
+        if (handle) {
+          workspaceDirectoryHandle = handle;
+          window.updateFolderStatusUI(handle.name, true);
+          return true;
+        }
+      } catch (_) {}
+
+      try {
+        const savedName = localStorage.getItem('yxg_workspace_folder_name') || '原鄉谷包車旅遊';
+        window.updateFolderStatusUI(savedName, false);
+      } catch (_) {
+        window.updateFolderStatusUI('原鄉谷包車旅遊', false);
+      }
+      return false;
+    }
+
+    window.chooseWorkspaceFolder = async function() {
+      if (!window.showDirectoryPicker) {
+        window.showToast('⚠️ 目前瀏覽器不支援資料夾選擇API');
+        return false;
+      }
+      try {
+        const handle = await window.showDirectoryPicker({ mode: 'readwrite' });
+        if (!handle) return false;
+        workspaceDirectoryHandle = handle;
+        await persistWorkspaceHandle(handle);
+        window.updateFolderStatusUI(handle.name, true);
+        window.showToast(`✨ 已成功綁定專案目錄：${handle.name}！`);
+        return true;
+      } catch (err) {
+        if (err.name !== 'AbortError') window.showToast('選擇資料夾失敗：' + (err.message || ''));
+        return false;
+      }
+    };
+
+    window.updateFolderStatusUI = function(folderName, isVerified) {
+      const statusEl = document.getElementById('finance-folder-status');
+      const displayName = folderName || '原鄉谷包車旅遊';
+      if (statusEl) {
+        statusEl.textContent = `${displayName}\\帳務結算\\ ${isVerified ? '✓ 已就緒' : '⚡ 點擊結算喚醒'}`;
+        statusEl.style.color = 'var(--gold-deep)';
+      }
+    };
+
+    async function writeAccountingFileDirectly(fileName, content, mimeType) {
+      if (!workspaceDirectoryHandle) await restoreWorkspaceDirectoryHandle();
+      if (!workspaceDirectoryHandle && window.showDirectoryPicker) {
+        const picked = await window.chooseWorkspaceFolder();
+        if (!picked) return false;
+      }
+      if (workspaceDirectoryHandle) {
+        try {
+          let perm = await workspaceDirectoryHandle.queryPermission({ mode: 'readwrite' });
+          if (perm !== 'granted') perm = await workspaceDirectoryHandle.requestPermission({ mode: 'readwrite' });
+          if (perm === 'granted') {
+            const accountingDir = await workspaceDirectoryHandle.getDirectoryHandle('帳務結算', { create: true });
+            const fileHandle = await accountingDir.getFileHandle(fileName, { create: true });
+            const writer = await fileHandle.createWritable();
+            await writer.write(new Blob([content], { type: mimeType }));
+            await writer.close();
+            return true;
+          }
+        } catch (err) {}
+      }
+      return false;
+    }
+
+    window.copyAccountingFolderPath = function() {
+      const base = workspaceDirectoryHandle ? workspaceDirectoryHandle.name : '原鄉谷包車旅遊';
+      const path = `${base}\\帳務結算\\`;
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(path);
+        window.showToast('📋 已複製帳務路徑：' + path);
+      }
+    };
+
+    window.exportFinanceToExcelCSV = async function() {
+      let csvContent = '\uFEFF案件編號,執勤司導,車資總額,現場應收現金,司導應繳回公司,結算狀態\n';
+      (window.getFinanceRecords?.() || financeRecordsDatabase).forEach(r => {
+        const fare = Number(r.carFare) || 0;
+        const cash = fare + (Number(r.preorderItems) || 0) - (Number(r.deposit) || 0);
+        const remit = cash - Math.round(fare * 0.9);
+        csvContent += `"${r.caseId}","${r.driver}",${fare},${cash},${remit},"${r.status}"\n`;
+      });
+      const fileName = '原鄉谷包車旅遊_帳務結算總表.csv';
+      const isSaved = await writeAccountingFileDirectly(fileName, csvContent, 'text/csv;charset=utf-8;');
+      if (isSaved) window.showToast(`🎉 已存入專案目錄\\帳務結算\\${fileName}`);
+      else {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
+    };
+
+    window.exportFinanceToJSON = async function() {
+      const sysSettings = window.loadSystemSettings();
+      const exportData = { platform: '原鄉谷包車旅遊', records: window.getFinanceRecords?.() || financeRecordsDatabase, bankSettings: sysSettings };
+      const jsonStr = JSON.stringify(exportData, null, 2);
+      const fileName = '帳務總表.json';
+      const isSaved = await writeAccountingFileDirectly(fileName, jsonStr, 'application/json;charset=utf-8;');
+      if (isSaved) window.showToast(`🎉 已存入專案目錄\\帳務結算\\${fileName}`);
+      else {
+        const blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8;' });
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        URL.revokeObjectURL(link.href);
+      }
+    };
+
+    window.openStatementModal = function() {
+      const sysSettings = window.loadSystemSettings();
+      let sumCarFare = 0, sumCash = 0, sumRemit = 0;
+      (window.getFinanceRecords?.() || financeRecordsDatabase).forEach(r => {
+        const fare = Number(r.carFare) || 0;
+        const cash = fare - (Number(r.deposit) || 0);
+        const remit = cash - Math.round(fare * 0.9);
+        sumCarFare += fare; sumCash += cash; sumRemit += remit;
+      });
+
+      document.getElementById('statement-printable-sheet').innerHTML = `
+        <div style="background:#FFFFFF; border:1px solid var(--border-gilded); border-radius:12px; padding:22px 24px;">
+          <h2 style="margin:0 0 4px; font-size:1.2rem;">原鄉谷包車旅遊 · 營運核算書札</h2>
+          <p style="margin:0 0 16px; color:var(--ink-sub); font-size:0.78rem;">結算日期：${new Date().toLocaleDateString('zh-TW')}</p>
+          <div style="font-weight:900; color:var(--burgundy-seal); margin-bottom:12px;">司導應繳回總額：$${sumRemit.toLocaleString()} 元</div>
+          <div style="font-size:0.75rem; color:var(--ink-sub);">匯款銀行：${sysSettings.bankName || '（未設定）'} 帳號：${sysSettings.bankAccount || '（未設定）'}</div>
+        </div>
+      `;
+      document.getElementById('statement-modal')?.classList.add('active');
+    };
+
+    window.closeStatementModal = function() { document.getElementById('statement-modal')?.classList.remove('active'); };
+    window.printStatementSheet = function() { window.print(); };
+    window.copyStatementLineText = function() {
+      window.showToast('📲 已複製 LINE 對帳通知訊息！');
+    };
+
+    const SYSTEM_SETTINGS_STORAGE_KEY = 'yxg-system-settings-v1';
+    const defaultSystemSettings = {
+      generatorPath: '原鄉谷包車旅遊_行程生成器.html',
+      defaultDeparture: '09:00',
+      dispatchRate: 10,
+      bankName: '', bankBranch: '', bankAccount: '', bankHolder: ''
+    };
+
+    window.loadSystemSettings = function() {
+      try {
+        const saved = localStorage.getItem(SYSTEM_SETTINGS_STORAGE_KEY);
+        if (saved) return Object.assign({}, defaultSystemSettings, JSON.parse(saved));
+      } catch (_) {}
+      return defaultSystemSettings;
+    };
+
+    window.initSystemSettingsForm = function() {
+      const data = window.loadSystemSettings();
+      document.getElementById('generator-path').value = data.generatorPath || defaultGeneratorFileName;
+      document.getElementById('setting-default-departure').value = data.defaultDeparture;
+      document.getElementById('setting-dispatch-rate').value = data.dispatchRate;
+      document.getElementById('setting-bank-name').value = data.bankName || '';
+      document.getElementById('setting-bank-branch').value = data.bankBranch || '';
+      document.getElementById('setting-bank-account').value = data.bankAccount || '';
+      document.getElementById('setting-bank-holder').value = data.bankHolder || '';
+    };
+
+    window.saveSystemSettings = function() {
+      let generatorPath = document.getElementById('generator-path')?.value.trim() || defaultSystemSettings.generatorPath;
+      generatorPath = generatorPath.trim();
+      if (generatorPath && !generatorPath.toLowerCase().endsWith('.html') && !generatorPath.toLowerCase().endsWith('.htm')) generatorPath += '.html';
+      document.getElementById('generator-path').value = generatorPath;
+
+      const data = {
+        generatorPath,
+        defaultDeparture: document.getElementById('setting-default-departure')?.value || '09:00',
+        dispatchRate: Number(document.getElementById('setting-dispatch-rate')?.value) || 10,
+        bankName: document.getElementById('setting-bank-name')?.value.trim() || '',
+        bankBranch: document.getElementById('setting-bank-branch')?.value.trim() || '',
+        bankAccount: document.getElementById('setting-bank-account')?.value.trim() || '',
+        bankHolder: document.getElementById('setting-bank-holder')?.value.trim() || ''
+      };
+      try { localStorage.setItem(SYSTEM_SETTINGS_STORAGE_KEY, JSON.stringify(data)); } catch (_) {}
+      window.showToast('💾 原鄉谷包車旅遊 系統設定已成功儲存！');
+    };
+
+    window.resetSystemSettings = function() {
+      try { localStorage.removeItem(SYSTEM_SETTINGS_STORAGE_KEY); } catch (_) {}
+      window.initSystemSettingsForm();
+      window.showToast('↻ 系統設定已重置！');
+    };
+
+    window.testOpenGenerator = function() {
+      const sysSettings = window.loadSystemSettings();
+      let targetUrl = document.getElementById('generator-path')?.value.trim() || sysSettings.generatorPath || defaultGeneratorFileName;
+      targetUrl = targetUrl.trim();
+      if (targetUrl && !targetUrl.toLowerCase().endsWith('.html') && !targetUrl.toLowerCase().endsWith('.htm')) targetUrl += '.html';
+      window.open(`${targetUrl}?test=1&t=${Date.now()}`, '_blank');
+      window.showToast(`🧪 正在連線：${targetUrl}`);
+    };
+
+    window.handleSelectGeneratorFile = function(files) {
+      if (!files || !files.length) return;
+      const realFilename = files[0].name;
+      const pathInput = document.getElementById('generator-path');
+      if (pathInput) {
+        pathInput.value = realFilename;
+        window.saveSystemSettings();
+        window.showToast(`🎉 已自動抓取實體檔名：${realFilename}`);
+      }
+    };
+
+    window.bringOrderToWorkspace = function(caseId) {
+      const caseInput = document.getElementById('dispatch-finance-case-id');
+      if (caseInput) { caseInput.value = caseId; window.updateOutputPreview(caseId); }
+      document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('[data-panel]').forEach(b => b.classList.remove('active'));
+      document.getElementById('confirmation')?.classList.add('active');
+      document.getElementById('create-confirmation')?.classList.add('active');
+      window.renderGuideForPanel('confirmation');
+      window.showToast(`✨ 已成功將案件 #${caseId} 帶入工作區！`);
+    };
+
+    window.recalculateLiveSummary = function() {
+      const textarea = document.getElementById('standard-text-workspace');
+      if (!textarea) return;
+      const text = textarea.value;
+
+      const matches = text.matchAll(/(?:今日車資|車資)[：:]\s*([0-9,]+)/g);
+      let totalCarFare = 0;
+      for (const m of matches) {
+        totalCarFare += parseInt(m[1].replace(/[^\d]/g, ''), 10) || 0;
+      }
+
+      let totalTickets = 0;
+      let ticketItemsText = [];
+      const railTicketItems = [];
+      let totalHotels = 0;
+      let hotelItemsText = [];
+
+      Object.values(window.itemPricingState).forEach(state => {
+        if (state.checked && Number(state.price) > 0 && Number(state.qty) > 0) {
+          const sub = (Number(state.price) || 0) * (Number(state.qty) || 1);
+          if (state.name.includes('房費') || state.name.includes('飯店')) {
+            totalHotels += sub;
+            hotelItemsText.push(`${state.name} (${state.price}元 × ${state.qty}) = $${sub.toLocaleString()}`);
+          } else {
+            totalTickets += sub;
+            if (/勝興.*(?:鐵(?:道|路)自行車|腳踏)|鐵(?:道|路)自行車/.test(state.name)) railTicketItems.push(state);
+            else ticketItemsText.push(`${state.name} (${state.price}元 × ${state.qty}) = $${sub.toLocaleString()}`);
+          }
+        }
+      });
+      if (railTicketItems.length) {
+        const railTotal = railTicketItems.reduce((sum, state) => sum + Number(state.price) * Number(state.qty), 0);
+        ticketItemsText.unshift(`勝興鐵路自行車｜${railTicketItems.map(state => `${state.name.includes('孩童') ? '幼童票' : '成人票'} ${state.price}元 × ${state.qty}`).join('；')} = $${railTotal.toLocaleString()}`);
+      }
+
+      const depositInput = document.getElementById('booking-deposit');
+      const deposit = parseInt(depositInput?.value, 10) || 0;
+      const grandTotal = totalCarFare + totalTickets + totalHotels - deposit;
+
+      const fareEl = document.getElementById('summary-car-fare');
+      if (fareEl) fareEl.textContent = `NT$ ${totalCarFare.toLocaleString()}`;
+      
+      const ticketEl = document.getElementById('summary-tickets-detail');
+      if (ticketEl) ticketEl.innerHTML = `<b>代訂票券明細：</b> ${ticketItemsText.length > 0 ? ticketItemsText.join('、 ') + ` (小計: $${totalTickets.toLocaleString()})` : '無'}`;
+      
+      const hotelEl = document.getElementById('summary-hotels-detail');
+      if (hotelEl) hotelEl.innerHTML = `<b>代訂飯店明細：</b> ${hotelItemsText.length > 0 ? hotelItemsText.join('、 ') + ` (小計: $${totalHotels.toLocaleString()})` : '無'}`;
+      
+      const depEl = document.getElementById('summary-deposit');
+      if (depEl) depEl.textContent = `- NT$ ${deposit.toLocaleString()}`;
+      
+      const grandEl = document.getElementById('summary-grand-total');
+      if (grandEl) grandEl.textContent = `NT$ ${grandTotal.toLocaleString()}`;
+    };
+
+    window.copySiteUrl = function() {
+      const url = document.getElementById('site-setting-url')?.value || 'https://tdb8053-bit.github.io/Website/';
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(url);
+        window.showToast('📋 已複製官網正式網址！');
+      }
+    };
+
+    window.saveWebsiteSettings = function() {
+      window.showToast('💾 官方網站設定已成功儲存！');
+    };
+
+    window.resetWebsiteSettings = function() {
+      document.getElementById('site-setting-url').value = 'https://tdb8053-bit.github.io/Website/';
+      document.getElementById('site-setting-slogan-zh').value = '探索寶島福爾摩沙之美，專屬奢華私旅。';
+      document.getElementById('site-setting-slogan-en').value = 'Curated Expedition in Formosa.';
+      window.showToast('↻ 官網設定已還原預設內容！');
+    };
+
+    // ==============================================================
+    // 頁面初始化
+    // ==============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('[data-panel]').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const panelId = btn.getAttribute('data-panel');
+          document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+          document.querySelectorAll('[data-panel]').forEach(b => b.classList.remove('active'));
+          document.getElementById(panelId)?.classList.add('active');
+          btn.classList.add('active');
+          window.renderGuideForPanel(panelId);
+        });
+      });
+
+      window.renderGuideForPanel('confirmation');
+      window.renderIndependentPreorderUI();
+      window.renderPlacesListUI();
+      window.initSystemSettingsForm();
+      window.onFinanceFilterChange();
+      restoreWorkspaceDirectoryHandle();
+      window.recalculateLiveSummary();
+      window.renderBackendFlightCardUI();
+
+      setTimeout(() => {
+        window.performItineraryAuditAndRouteCheck();
+      }, 60);
+    });
+  </script>
+  <script>
+  /* v0.6.1 案件閉環相容層：唯一案件來源，不覆蓋原有行程呈現功能。 */
+  (() => {
+    const CASES_KEY = 'yxg:v2:cases';
+    const ACTIVE_KEY = 'yxg:v2:active-case-id';
+    const DRIVERS_KEY = 'yxg:v2:drivers';
+    const ROUTES_KEY = 'yxg:v2:confirmed-routes';
+    const V2_GENERATOR = '原鄉谷包車旅遊_行程生成器.html';
+    const safeJson = (value, fallback) => { try { return JSON.parse(value) ?? fallback; } catch (_) { return fallback; } };
+    const readCases = () => safeJson(localStorage.getItem(CASES_KEY), []);
+    const writeCases = cases => localStorage.setItem(CASES_KEY, JSON.stringify(cases));
+    const normalizeMoney = value => Number(String(value || '').replace(/[^0-9]/g, '')) || 0;
+    const createCaseId = date => {
+      const stamp = String(date || new Date().toISOString().slice(0, 10)).replace(/[^0-9]/g, '');
+      const base = `${stamp.slice(0, 4) || new Date().getFullYear()}-${stamp.slice(4, 8) || '0101'}`;
+      return `${base}-${String(readCases().filter(c => c.id.startsWith(base)).length + 1).padStart(2, '0')}`;
+    };
+    const makeSummary = text => ({
+      customer: (text.match(/預約代表[：:]\s*([^\r\n]+)/) || [, '未填寫'])[1].trim(),
+      startDate: (text.match(/包車開始日期[：:]\s*([^\r\n]+)/) || [, ''])[1].trim().replace(/\//g, '-'),
+      endDate: (text.match(/包車結束日期[：:]\s*([^\r\n]+)/) || [, ''])[1].trim().replace(/\//g, '-'),
+      totalFare: normalizeMoney((text.match(/總車資[：:]\s*([^\r\n]+)/) || [, 0])[1]),
+      dailyFare: [...text.matchAll(/今日車資[：:]\s*([^\r\n]+)/g)].reduce((sum, m) => sum + normalizeMoney(m[1]), 0)
+    });
+    const validateCaseForDelivery = record => {
+      const s = record.summary || makeSummary(record.standardText || '');
+      const days = (record.standardText || '').match(/Day\s*\d+/gi) || [];
+      const errors = [];
+      if (!String(record.id || '').trim()) errors.push('請填寫案件編號');
+      if (!s.customer || s.customer === '未填寫' || !s.startDate || !s.endDate) errors.push('客戶或日期未完整填寫');
+      if (!days.length) errors.push('至少需要一日行程');
+      if (!s.totalFare) errors.push('總車資必須大於 0');
+      if (s.totalFare && s.dailyFare && s.totalFare !== s.dailyFare) errors.push('總車資與每日車資合計不一致');
+      return { valid: errors.length === 0, errors };
+    };
+    const loadCase = id => readCases().find(c => c.id === id) || null;
+    const saveCase = update => {
+      const cases = readCases();
+      const index = cases.findIndex(c => c.id === update.id);
+      const previous = index >= 0 ? cases[index] : {};
+      const next = { ...previous, ...update, summary: makeSummary(update.standardText || previous.standardText || ''), revision: (previous.revision || 0) + 1, updatedAt: new Date().toISOString() };
+      if (update.status === 'draft' && update.standardText && update.standardText !== previous.standardText) delete next.delivery;
+      if (index >= 0) cases[index] = next; else cases.push(next);
+      writeCases(cases); localStorage.setItem(ACTIVE_KEY, next.id); return next;
+    };
+    window.YxgCaseStore = { createCaseId, saveCase, loadCase, listCases: readCases, normalizeMoney, validateCaseForDelivery, keys: { CASES_KEY, ACTIVE_KEY, DRIVERS_KEY, ROUTES_KEY } };
+    const legacyInputChanged = window.handleWorkspaceInputChanged;
+    window.handleWorkspaceInputChanged = function() {
+      legacyInputChanged?.();
+      const id = document.getElementById('dispatch-finance-case-id')?.value.trim();
+      const text = document.getElementById('standard-text-workspace')?.value.trim();
+      if (id && text) saveCase({ id, standardText: text, status: 'draft' });
+    };
+    window.openSelectedGenerator = function() {
+      const textarea = document.getElementById('standard-text-workspace');
+      const caseInput = document.getElementById('dispatch-finance-case-id');
+      const text = textarea?.value.trim() || '';
+      if (!text) return window.showToast('請先貼上並整理標準行程文字。', true);
+      let id = caseInput?.value.trim() || '';
+      if (!id) { id = createCaseId(makeSummary(text).startDate); if (caseInput) caseInput.value = id; window.updateOutputPreview(id); }
+      const currentRouteCache = window.loadRouteCache?.() || {};
+      const routes = Object.entries(currentRouteCache).flatMap(([key, value]) => {
+        const [from, to] = key.split(' -> '); return from && to && Number(value?.minutes) > 0 ? [{ from, to, mins: Number(value.minutes), label: `車程約 ${value.minutes} 分鐘`, confirmedAt: new Date().toISOString() }] : [];
+      });
+      localStorage.setItem(ROUTES_KEY, JSON.stringify(routes));
+      const record = saveCase({ id, standardText: text, routes, status: 'ready-for-generator', driver: loadCase(id)?.driver || null, delivery: loadCase(id)?.delivery || null });
+      const check = validateCaseForDelivery(record);
+      if (!check.valid) return window.showToast(`無法開啟生成器：${check.errors.join('、')}`, true);
+      const url = `${V2_GENERATOR}?caseId=${encodeURIComponent(id)}&t=${Date.now()}`;
+      const opened = window.open(url, '_blank');
+      if (!opened) window.showToast(`瀏覽器阻擋開啟，請手動開啟：${url}`, true);
+      else window.showToast(`已建立案件 #${id} 並開啟新版生成器。`);
+    };
+    window.bringOrderToWorkspace = function(caseId) {
+      const record = loadCase(caseId); if (!record) return window.showToast('找不到此案件資料。', true);
+      document.getElementById('standard-text-workspace').value = record.standardText || '';
+      document.getElementById('dispatch-finance-case-id').value = record.id;
+      window.handleWorkspaceInputChanged(); window.showToast(`已載入案件 #${record.id}。`);
+    };
+    window.renderV2CaseLedger = function() {
+      const target = document.getElementById('orders') || document.getElementById('finance'); if (!target) return;
+      let panel = document.getElementById('v2-case-ledger');
+      if (!panel) { panel = document.createElement('article'); panel.id = 'v2-case-ledger'; panel.className = 'card'; target.appendChild(panel); }
+      const escapeHtml = value => String(value || '').replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+      const rows = readCases().map(c => `<tr><td>#${escapeHtml(c.id)}</td><td>${escapeHtml(c.summary?.customer)}</td><td>${escapeHtml(c.driver?.name || '未指派')}</td><td>${escapeHtml(c.summary?.totalFare || 0)}</td><td>${escapeHtml(c.status || 'draft')}</td></tr>`).join('') || '<tr><td colspan="5">尚無案件資料</td></tr>';
+      panel.innerHTML = `<h3>v2 實際案件／派遣清單</h3><table><thead><tr><th>案件</th><th>客戶</th><th>司導</th><th>車資</th><th>狀態</th></tr></thead><tbody>${rows}</tbody></table>`;
+    };
+    const oldOnload = window.onload;
+    window.onload = function() { oldOnload?.(); document.getElementById('generator-path').value = V2_GENERATOR; window.renderV2CaseLedger(); };
+    window.addEventListener('storage', event => { if (event.key === CASES_KEY) window.renderV2CaseLedger(); });
+  })();
+</script>
+<script>
+(() => {
+  const CANONICAL_GENERATOR_FILE = '原鄉谷包車旅遊_行程生成器.html';
+  window.openSelectedGenerator = function() {
+    const review = window.YxgIntake.reviewStandard(document.getElementById('standard-text-workspace')?.value || '');
+    if (!review.ok) {
+      const message = `請先核對行程：${review.issues.join('、')}`;
+      const status = document.getElementById('simple-intake-status');
+      if (status) status.textContent = message;
+      return window.showToast(message, true);
+    }
+    // Open the real generator while this button's user gesture is still active.
+    // This avoids both popup blocking and an about:blank page if later sync work fails.
+    const generatorWindow = window.open(CANONICAL_GENERATOR_FILE, '_blank');
+    if (!generatorWindow) {
+      return window.showToast(`瀏覽器阻擋新分頁，請允許彈出視窗後再試：${CANONICAL_GENERATOR_FILE}`, true);
+    }
+    let text = window.cleanStandardItineraryText?.(document.getElementById('standard-text-workspace')?.value || '') || '';
+    if (!text) {
+      generatorWindow.close();
+      return window.showToast('請先貼上行程文字。', true);
+    }
+    const dailyTotal = [...text.matchAll(/今日車資[：:]\s*([^\r\n]+)/g)].reduce((sum, item) => sum + (Number(String(item[1]).replace(/[^0-9]/g, '')) || 0), 0);
+    if (dailyTotal) {
+      text = text.replace(/^總車資[：:][^\r\n]*(?:\r?\n)?/gm, '');
+      text = `總車資：${dailyTotal}\n${text}`;
+    }
+    const selectedItems = Object.values(window.itemPricingState || {}).filter(item => item.checked && Number(item.price) > 0 && Number(item.qty) > 0);
+    const railTickets = selectedItems.filter(item => /勝興.*(?:鐵(?:道|路)自行車|腳踏)|鐵(?:道|路)自行車/.test(item.name));
+    const railTotal = railTickets.reduce((sum, item) => sum + Number(item.price) * Number(item.qty), 0);
+    const preorderLines = selectedItems.filter(item => !railTickets.includes(item)).flatMap(item => {
+      const subtotal = Number(item.price) * Number(item.qty);
+      return [item.name.includes('房費') || item.name.includes('飯店')
+        ? `代訂酒店房費：${item.name}｜房費 ${item.price} 元 × ${item.qty} 間＝${subtotal} 元`
+        : `代訂票券：${item.name}｜單價 ${item.price} 元 × ${item.qty}＝${subtotal} 元`];
+    });
+    if (railTickets.length) preorderLines.unshift(`代訂票券：勝興鐵路自行車｜${railTickets.map(item => `${item.name.includes('孩童') ? '幼童票' : '成人票'} ${item.qty} 張 × NT$ ${item.price}`).join('；')}＝${railTotal} 元`);
+    if (preorderLines.length) text = `${text}\n${preorderLines.join('\n')}`;
+    const caseInput = document.getElementById('dispatch-finance-case-id');
+    let caseId = caseInput?.value.trim() || '';
+    if (!caseId) {
+      caseId = window.YxgCaseStore.createCaseId((text.match(/包車開始日期[：:]\s*([^\r\n]+)/) || [, ''])[1].trim());
+      if (caseInput) caseInput.value = caseId;
+      window.updateOutputPreview?.(caseId);
+    }
+    const routes = Object.entries(window.loadRouteCache?.() || {}).flatMap(([key, value]) => {
+      const [from, to] = key.split(' -> ');
+      return from && to && Number(value?.minutes) > 0 ? [{ from, to, mins: Number(value.minutes), label: `車程約 ${value.minutes} 分鐘` }] : [];
+    });
+    try {
+      window.YxgCaseStore?.saveCase({ id: caseId, standardText: text, routes, driver: null, status: 'ready-for-generator' });
+      localStorage.setItem('yxg-text-workspace-draft-v1', text);
+      sessionStorage.setItem('yxg-text-workspace-draft-v1', text);
+    } catch (error) {
+      generatorWindow.close();
+      return window.showToast(`案件建立失敗：${error.message || '請重新整理後再試'}`, true);
+    }
+    // The fragment is a reliable cross-tab handoff for local file:// pages.
+    // The generator already accepts handoff text from the URL hash.
+    const generatorUrl = `${CANONICAL_GENERATOR_FILE}?caseId=${encodeURIComponent(caseId)}&t=${Date.now()}#handoff=${encodeURIComponent(text)}&caseId=${encodeURIComponent(caseId)}`;
+    generatorWindow.location.href = generatorUrl;
+    window.showToast(`已建立案件 #${caseId} 並於新分頁開啟行程生成器。`);
+  };
+  const canonicalOnload = window.onload;
+  window.onload = function() {
+    canonicalOnload?.();
+    document.getElementById('generator-path')?.closest('article')?.remove();
+    document.querySelector('button[data-panel="settings"]')?.remove();
+    document.querySelectorAll('[onclick="window.openSelectedGenerator()"]').forEach(button => { button.textContent = '🚀 自動建立案件並開啟行程生成器'; });
+  };
+})();
+</script>
+<script>
+/* driver-finance-ledger */
+(() => {
+  const FINANCE_HANDOFF_KEY = 'yxg:v2:finance-handoffs';
+    const readHandoffs = () => { try { const rows = JSON.parse(localStorage.getItem(FINANCE_HANDOFF_KEY) || '[]'); return Array.isArray(rows) ? rows : []; } catch (_) { return []; } };
+  window.getFinanceRecords = function() {
+    const byCaseId = new Map();
+    readHandoffs().forEach(row => { if (row?.caseId) byCaseId.set(String(row.caseId), row); });
+    return [...byCaseId.values()];
+  };
+  window.prepareFinanceViewForHandoffs = function() {
+    const dates = readHandoffs().map(row => String(row.date || '').slice(0, 4)).filter(year => /^\d{4}$/.test(year));
+    if (!dates.length) return;
+    const start = document.getElementById('finance-filter-start');
+    const end = document.getElementById('finance-filter-end');
+    if (start) start.value = `${Math.min(...dates.map(Number))}-01-01`;
+    if (end) end.value = `${Math.max(...dates.map(Number))}-12-31`;
+    window.onFinanceFilterChange?.();
+  };
+  window.addEventListener?.('DOMContentLoaded', () => window.prepareFinanceViewForHandoffs());
+  window.addEventListener?.('storage', event => {
+    if (event.key === FINANCE_HANDOFF_KEY) window.prepareFinanceViewForHandoffs();
+  });
+})();
+</script>
+<script>
+/* itinerary-intake-safety-v094 */
+window.YxgIntake = (() => {
+  const parseDate = value => {
+    const match = String(value || '').match(/^(\d{4})[\/-](\d{1,2})[\/-](\d{1,2})$/);
+    if (!match) return null;
+    const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+    const date = new Date(Date.UTC(year, month - 1, day));
+    if (date.getUTCFullYear() !== year || date.getUTCMonth() + 1 !== month || date.getUTCDate() !== day) return null;
+    return date;
+  };
+  const sourceDates = (source, currentYear) => {
+    const labeledStart = source.match(/包車開始日期[：:]\s*(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/);
+    const labeledEnd = source.match(/包車結束日期[：:]\s*(\d{4}[\/-]\d{1,2}[\/-]\d{1,2})/);
+    if (labeledStart && labeledEnd) return [parseDate(labeledStart[1]), parseDate(labeledEnd[1])];
+    const explicit = [...source.matchAll(/\b20\d{2}[\/-]\d{1,2}[\/-]\d{1,2}\b/g)].map(match => parseDate(match[0]));
+    if (explicit.length >= 2) return [explicit[0], explicit[explicit.length - 1]];
+    const chinese = [...source.matchAll(/(\d{1,2})\s*月\s*(\d{1,2})\s*日?/g)];
+    if (chinese.length >= 2) {
+      const year = Number(currentYear) + (/明年/.test(source) ? 1 : 0);
+      return [parseDate(`${year}/${chinese[0][1]}/${chinese[0][2]}`), parseDate(`${year}/${chinese[chinese.length - 1][1]}/${chinese[chinese.length - 1][2]}`)];
+    }
+    return null;
+  };
+  const reviewConversion = (source, candidate, currentYear = new Date().getFullYear()) => {
+    const issues = [];
+    const expected = sourceDates(source, currentYear);
+    const startRaw = candidate.match(/^包車開始日期[：:]\s*(\S+)/m)?.[1];
+    const endRaw = candidate.match(/^包車結束日期[：:]\s*(\S+)/m)?.[1];
+    const start = parseDate(startRaw), end = parseDate(endRaw);
+    if (!start || !end || start > end) issues.push('包車日期無效或先後顛倒');
+    if (!expected || !expected[0] || !expected[1]) issues.push('原文日期不足，請先確認日期');
+    else if (start?.getTime() !== expected[0].getTime() || end?.getTime() !== expected[1].getTime()) issues.push('整理後日期與原文不符');
+    const dayNumbers = [...candidate.matchAll(/^Day\s+(\d+)\s*$/gmi)].map(match => Number(match[1]));
+    const expectedDays = start && end ? Math.round((end - start) / 86400000) + 1 : 0;
+    if (!expectedDays || dayNumbers.length !== expectedDays || dayNumbers.some((day, i) => day !== i + 1)) issues.push('Day 天數與日期不符或不連續');
+    const sourcePhone = source.match(/09[\d\-\s]{8,}/)?.[0].replace(/\D/g, '');
+    const outputPhone = candidate.match(/^聯絡電話[：:]\s*([^\r\n]*)/m)?.[1]?.replace(/\D/g, '');
+    if (sourcePhone && outputPhone !== sourcePhone) issues.push('聯絡電話與原文不符');
+    const sourceName = source.match(/(?:我們是|我是|預約代表[：:]\s*)([\p{Script=Han}]{1,3}(?:先生|小姐|女士))/u)?.[1] || source.match(/[\p{Script=Han}]{1,3}(?:先生|小姐|女士)/u)?.[0];
+    if (sourceName && !candidate.includes(sourceName)) issues.push('預約代表與原文不符');
+    if (!/(接機|抵達航班|抵達機場)/.test(source) && /^接機資訊\s*$/m.test(candidate)) issues.push('原文沒有接機，卻產生接機資料');
+    const sourceFlights = [...source.matchAll(/\b[A-Z]{2}\s*\d{2,4}\b/gi)].map(match => match[0].replace(/\s/g, '').toUpperCase());
+    for (const flight of [...candidate.matchAll(/^航班編號[：:]\s*([A-Z]{2}\s*\d{2,4})/gmi)]) {
+      if (!sourceFlights.includes(flight[1].replace(/\s/g, '').toUpperCase())) issues.push('航班編號不是原文提供');
+    }
+    for (const flight of sourceFlights) {
+      if (!candidate.toUpperCase().includes(flight)) issues.push('原文航班編號在整理後遺失');
+    }
+    const sourceDeparture = source.match(/(\d{1,2}:\d{2})\s*起飛/)?.[1];
+    if (sourceDeparture && (!/^送機資訊\s*$/m.test(candidate) || !candidate.includes(`起飛時間：${sourceDeparture}`))) issues.push('送機起飛時間與原文不符');
+    const sourceRailBooking = source.match(/^(?:勝興預約時間|預約時間)[：:]\s*(\d{1,2}:\d{2})/m)?.[1];
+    if (sourceRailBooking && !candidate.includes(`預約時間：${sourceRailBooking}`)) issues.push('勝興預約班次在整理後遺失');
+    if (/您好|我們是/.test(candidate.split(/行程內容[：:]?/).slice(1).join(' '))) issues.push('原始對話被當作景點');
+    let text = candidate;
+    if (!issues.length) {
+      const sourceFareByDay = new Map();
+      source.split(/(?=^Day\s+\d+\s*$)/gmi).forEach(block => {
+        const day = block.match(/^Day\s+(\d+)\s*$/mi)?.[1];
+        const fare = block.match(/^今日車資[：:]\s*([\d,]+)/m)?.[1];
+        if (day && fare) sourceFareByDay.set(Number(day), Number(fare.replace(/,/g, '')));
+      });
+      let candidateDay = 0;
+      text = candidate.replace(/^Day\s+(\d+)\s*$|^今日車資[：:]\s*[\d,]+\s*$/gmi, line => {
+        const day = line.match(/^Day\s+(\d+)/i)?.[1];
+        if (day) { candidateDay = Number(day); return line; }
+        const given = sourceFareByDay.get(candidateDay);
+        return given ? `今日車資：${given}` : '今日車資：待補';
+      });
+      if (!/^總車資[：:]\s*[\d,]+/m.test(source)) text = text.replace(/^總車資[：:][^\r\n]*(?:\r?\n)?/gm, '');
+    }
+    return { ok: issues.length === 0, issues, text };
+  };
+  const reviewStandard = text => {
+    const issues = [];
+    const start = parseDate(text.match(/^包車開始日期[：:]\s*(\S+)/m)?.[1]);
+    const end = parseDate(text.match(/^包車結束日期[：:]\s*(\S+)/m)?.[1]);
+    if (!start || !end || start > end) issues.push('請填寫有效的包車開始與結束日期');
+    const days = [...text.matchAll(/^Day\s+(\d+)\s*$/gmi)].map(match => Number(match[1]));
+    const expectedCount = start && end ? Math.round((end - start) / 86400000) + 1 : 0;
+    if (!expectedCount || days.length !== expectedCount || days.some((day, i) => day !== i + 1)) issues.push('Day 天數必須與日期相符且連續');
+    const fares = [...text.matchAll(/^今日車資[：:]\s*([^\r\n]*)/gm)].map(match => Number(match[1].replace(/[^\d]/g, '')));
+    if (fares.length !== days.length || fares.some(fare => !fare)) issues.push('請補齊每一天的今日車資');
+    return { ok: issues.length === 0, issues };
+  };
+  return { reviewConversion, reviewStandard };
+})();
+</script>
+<script>
+/* simple-home-auto-launch */
+(() => {
+  const bootSimpleHome = () => {
+    const confirmation = document.getElementById('confirmation');
+    const textarea = document.getElementById('standard-text-workspace');
+    if (!confirmation || !textarea || document.getElementById('simple-intake-home')) return;
+
+    const legacyCard = textarea.closest('article');
+    const simpleHome = document.createElement('section');
+    simpleHome.id = 'simple-intake-home';
+    simpleHome.className = 'card';
+    simpleHome.style.cssText = 'border:1.5px solid var(--gold-michelin);background:#FAF8F5;padding:24px;max-width:920px;margin:0 auto;';
+    simpleHome.innerHTML = `
+      <div style="text-align:center; margin-bottom:22px;">
+        <div class="eyebrow">Simple Itinerary Intake</div>
+        <h2 style="margin:8px 0; color:var(--ink-black);">貼上行程，系統自動完成其餘工作</h2>
+        <p style="margin:0; color:var(--ink-sub);">系統會檢查資料、加總車資；如需代訂，勾選後再建立案件並開啟生成器。</p>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px;">
+        <div style="padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border-gilded);"><b style="color:var(--gold-deep);">1｜貼上行程</b><span style="display:block;font-size:.78rem;color:var(--ink-sub);margin-top:4px;">貼入客人提供的行程資料</span></div>
+        <div style="padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border-gilded);"><b style="color:var(--gold-deep);">2｜自動檢查／補齊</b><span style="display:block;font-size:.78rem;color:var(--ink-sub);margin-top:4px;">核對日期、每日車資與行程資料</span></div>
+        <div style="padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border-gilded);"><b style="color:var(--gold-deep);">3｜確認代訂並開啟</b><span style="display:block;font-size:.78rem;color:var(--ink-sub);margin-top:4px;">勾選需要的項目後建立案件</span></div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
+        <button type="button" class="button primary small" onclick="window.convertRawTextToStandardWithGemini()">✨ 整理客人自由文字</button>
+        <button type="button" class="button small" onclick="window.configureGeminiKeyPrompt()">🔑 設定整理功能</button>
+      </div>
+      <div id="simple-intake-input-slot"></div>
+      <p id="simple-intake-status" aria-live="polite" style="margin:10px 0 0;padding:10px 12px;border-radius:8px;background:#fff;color:var(--ink-sub);font-size:.84rem;">請直接貼上行程資料；系統會自動檢查並列出可代訂項目。</p>
+      <div id="simple-intake-review-slot" style="display:grid;gap:10px;margin:16px 0;"></div>
+      <div id="simple-intake-pricing-slot"></div>
+      <div id="simple-rail-booking" hidden style="margin-top:12px;padding:14px;border:1px solid #DFBE7A;border-radius:10px;background:#FFF8E7;">
+        <label for="simple-rail-time" style="display:block;font-weight:800;color:var(--gold-deep);">🚂 勝興鐵路自行車預約班次時間</label>
+        <p style="font-size:.78rem;margin:4px 0 8px;">須先預約才有票；勾選代訂僅計入報價，不代表已取得票券。集合時間為預約班次後 90 分鐘，請提前 30 分鐘報到。</p>
+        <input id="simple-rail-time" type="time" aria-label="勝興鐵路自行車預約班次時間" style="padding:8px;border:1px solid var(--border-gilded);border-radius:8px;">
+        <span id="simple-rail-warning" style="margin-left:8px;color:#92400E;font-size:.78rem;font-weight:700;"></span>
+      </div>
+      <div id="simple-intake-flight-slot"></div>
+      <div id="simple-intake-deposit-slot"></div>
+      <div id="simple-intake-case-slot"></div>
+      <button id="simple-open-generator" type="button" class="button gold" style="width:100%;margin-top:16px;padding:14px;font-size:.95rem;">🚀 建立案件並開啟行程生成器</button>
+      <p style="margin:10px 0 0;font-size:.76rem;color:var(--ink-sub);">未勾選的代訂項目不會計入總額；其他人工調整請由左側「進階管理」進入。</p>
+    `;
+    confirmation.prepend(simpleHome);
+    simpleHome.querySelector('#simple-intake-input-slot').appendChild(textarea);
+    const reviewSlot = document.getElementById('simple-intake-review-slot');
+    const flightCard = document.getElementById('backend-flight-card');
+    const auditCard = document.getElementById('audit-items-list')?.parentElement;
+    const routesCard = document.getElementById('route-segments-list')?.parentElement;
+    if (flightCard) document.getElementById('simple-intake-flight-slot')?.appendChild(flightCard);
+    if (auditCard) reviewSlot?.appendChild(auditCard);
+    if (routesCard && reviewSlot) {
+      const routeDetails = document.createElement('details');
+      routeDetails.style.cssText = 'padding:10px;border:1px solid var(--border-gilded);border-radius:10px;background:#fff;';
+      routeDetails.innerHTML = '<summary style="cursor:pointer;font-weight:800;color:var(--gold-deep);">🚗 展開路段檢查詳情</summary>';
+      routeDetails.appendChild(routesCard);
+      reviewSlot.appendChild(routeDetails);
+    }
+    const summaryCard = document.getElementById('live-financial-summary-card');
+    const preorderBlock = document.getElementById('independent-preorder-container')?.parentElement;
+    const depositBlock = document.getElementById('booking-deposit')?.parentElement;
+    const caseInput = document.getElementById('dispatch-finance-case-id');
+    const caseBlock = caseInput?.parentElement;
+    if (summaryCard) document.getElementById('simple-intake-pricing-slot')?.appendChild(summaryCard);
+    if (preorderBlock) document.getElementById('simple-intake-pricing-slot')?.appendChild(preorderBlock);
+    if (depositBlock) document.getElementById('simple-intake-deposit-slot')?.appendChild(depositBlock);
+    if (caseBlock) document.getElementById('simple-intake-case-slot')?.appendChild(caseBlock);
+    textarea.value = '';
+    if (caseInput) caseInput.value = '';
+    const outputPreview = document.getElementById('output-preview');
+    if (outputPreview) {
+      outputPreview.textContent = '未填案件編號時，系統將依出發日期自動產生並帶入生成器。';
+      outputPreview.style.color = 'var(--ink-sub)';
+    }
+    textarea.placeholder = '請直接貼上客人提供的完整行程資料…系統檢查後可勾選代訂項目';
+    textarea.style.minHeight = '320px';
+    if (legacyCard) legacyCard.hidden = true;
+    [...confirmation.children].forEach(child => { if (child !== simpleHome) child.hidden = true; });
+
+    const menu = document.querySelector('.menu');
+    if (menu) {
+      const advancedButtons = [...menu.querySelectorAll('button')].filter(button => button.id !== 'create-confirmation');
+      advancedButtons.forEach(button => { button.hidden = true; });
+      const advancedToggle = document.createElement('button');
+      advancedToggle.type = 'button';
+      advancedToggle.className = 'button small';
+      advancedToggle.style.margin = '12px';
+      advancedToggle.textContent = '⚙ 進階管理';
+      advancedToggle.addEventListener('click', () => {
+        advancedButtons.forEach(button => { button.hidden = false; });
+        advancedToggle.hidden = true;
+      });
+      menu.appendChild(advancedToggle);
+      document.getElementById('create-confirmation')?.addEventListener('click', () => {
+        simpleHome.hidden = false;
+        [...confirmation.children].forEach(child => { child.hidden = false; });
+        if (legacyCard) legacyCard.hidden = false;
+      });
+    }
+
+    const status = document.getElementById('simple-intake-status');
+    const openButton = document.getElementById('simple-open-generator');
+    const railBooking = document.getElementById('simple-rail-booking');
+    const railTime = document.getElementById('simple-rail-time');
+    const railWarning = document.getElementById('simple-rail-warning');
+    const updateIntakeStatus = () => {
+      if (!textarea.value.trim()) {
+        status.textContent = '請直接貼上行程資料；系統會自動檢查並列出可代訂項目。';
+        return;
+      }
+      const review = window.YxgIntake.reviewStandard(textarea.value);
+      status.textContent = !/^Day\s+\d+\s*$/im.test(textarea.value)
+        ? '這是自由文字，請先按「整理客人自由文字」，再核對整理結果。'
+        : review.ok
+          ? '已完成檢查。請勾選需要代訂的票券或飯店，再建立案件並開啟生成器。'
+          : `檢查發現待補事項：${review.issues.join('、')}。請補齊後再開啟生成器。`;
+    };
+    const refreshRail = () => {
+      const hasRail = /勝興.*(?:鐵(?:道|路)自行車|腳踏(?:火車|車))|鐵(?:道|路)自行車/.test(textarea.value);
+      if (railBooking) railBooking.hidden = !hasRail;
+      const saved = textarea.value.match(/^勝興預約時間[：:]\s*(\d{1,2}:\d{2})/m)?.[1] || textarea.value.match(/^預約時間[：:]\s*(\d{1,2}:\d{2})/m)?.[1] || '';
+      if (railTime && document.activeElement !== railTime) railTime.value = saved;
+      if (railWarning) railWarning.textContent = hasRail && !saved ? '班次未確認，生成器將顯示集合時間待確認。' : '';
+    };
+    railTime?.addEventListener('input', () => {
+      const value = railTime.value;
+      let updated = textarea.value.replace(/^(?:勝興預約時間|預約時間)[：:][^\r\n]*(?:\r?\n)?/gm, '');
+      if (value) updated = updated.replace(/^(.*(?:勝興.*(?:鐵(?:道|路)自行車|腳踏(?:火車|車))|鐵(?:道|路)自行車).*)$/m, `$1\n勝興預約時間：${value}`);
+      textarea.value = updated;
+      window.handleWorkspaceInputChanged?.();
+      refreshRail();
+    });
+    textarea.addEventListener('input', () => { refreshRail(); updateIntakeStatus(); });
+    textarea.addEventListener('paste', event => {
+      const pastedText = event.clipboardData?.getData('text/plain') || '';
+      if (!pastedText.trim()) return;
+      event.preventDefault();
+      textarea.value = pastedText.trim();
+      status.textContent = '正在自動檢查行程資料與可代訂項目…';
+      window.handleWorkspaceInputChanged?.();
+      window.performItineraryAuditAndRouteCheck?.();
+      window.renderIndependentPreorderUI?.();
+      window.recalculateLiveSummary?.();
+      refreshRail();
+      updateIntakeStatus();
+    });
+    openButton?.addEventListener('click', () => {
+      if (!textarea.value.trim()) return window.showToast?.('請先貼上行程資料。', true);
+      window.openSelectedGenerator?.();
+    });
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootSimpleHome);
+  else bootSimpleHome();
+})();
+</script>
+</body>
+</html>
