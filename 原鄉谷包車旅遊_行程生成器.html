@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="google" content="notranslate">
-<title>原鄉谷包車旅遊 · 尊榮行程生成器 v1.6.79</title>
+<title>原鄉谷包車旅遊 · 尊榮行程生成器</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -64,6 +64,56 @@ html[data-lang="en"] .font-serif-luxury {
   border-radius: var(--premium-radius-card);
   box-shadow: 0 8px 30px -4px rgba(60, 52, 40, 0.05);
 }
+
+.vintage-journey-ticket {
+  background: #F8F5EE;
+  border: 1px solid #DFD5C4;
+  border-radius: 12px;
+  position: relative;
+  box-shadow: 0 8px 24px rgba(50, 42, 30, 0.05);
+  overflow: hidden;
+  user-select: text;
+}
+.ticket-notch-left, .ticket-notch-right {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 14px;
+  height: 24px;
+  background: var(--bg-alabaster);
+  z-index: 30;
+  pointer-events: none;
+}
+.ticket-notch-left { left: -1px; border-top-right-radius: 20px; border-bottom-right-radius: 20px; border-right: 1px solid #DFD5C4; }
+.ticket-notch-right { right: -1px; border-top-left-radius: 20px; border-bottom-left-radius: 20px; border-left: 1px solid #DFD5C4; }
+.ticket-grid-layout {
+  display: grid;
+  grid-template-columns: 46% 25% 29%;
+  align-items: stretch;
+  position: relative;
+  z-index: 10;
+  min-height: 205px;
+}
+.ticket-col-divider { position: relative; border-left: 1.5px dotted #C8BC9F; min-width: 0; }
+.ticket-col-notch-top, .ticket-col-notch-bottom {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 8px;
+  background: var(--bg-alabaster);
+  z-index: 25;
+  pointer-events: none;
+}
+.ticket-col-notch-top { top: -1px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px; border-bottom: 1px solid #DFD5C4; }
+.ticket-col-notch-bottom { bottom: -1px; border-top-left-radius: 12px; border-top-right-radius: 12px; border-top: 1px solid #DFD5C4; }
+.mountain-contour-svg { position: absolute; bottom: 0; left: 12%; width: 150px; opacity: .28; pointer-events: none; z-index: 0; }
+.yuyupas-card { margin-top: 16px; padding: 16px; border: 1px solid #D8B77A; border-radius: 14px; background: #FFFCF5; }
+.yuyupas-card h4 { font-size: 15px; font-weight: 800; color: #6A4F1D; }
+.yuyupas-card p { font-size: 12px; line-height: 1.75; color: #5A5954; }
+.yuyupas-alert { color: #B42318 !important; font-weight: 800 !important; }
+.yuyupas-slot-control { display: block; margin: 10px 0; font-size: 12px; color: #6A4F1D; font-weight: 700; }
+.yuyupas-slot-control select { margin-left: 6px; padding: 5px 8px; border: 1px solid #D8B77A; border-radius: 7px; background: white; }
 
 .brand-seal-box {
   width: 42px;
@@ -463,7 +513,7 @@ html[data-lang="en"] .font-serif-luxury {
 <section id="generator-panel" class="generator-panel space-y-3.5 font-sans-ui">
   <div class="flex justify-between items-center border-b border-[#E7DFD0] pb-2">
     <div>
-      <h2 class="text-xs font-bold font-cinzel text-[#8C6D37] uppercase tracking-wider">🛠️ 原鄉谷包車旅遊 行程生成器 v1.6.79</h2>
+      <h2 class="text-xs font-bold font-cinzel text-[#8C6D37] uppercase tracking-wider">🛠️ 原鄉谷包車旅遊 行程生成器</h2>
       <p class="text-[11px] text-[#5A5954] mt-0.5">三階對比色調度工廠 · 步驟清楚獨立，出單直覺又零失誤！</p>
     </div>
     <span class="text-[10px] font-bold bg-[#F4EEDF] text-[#7A5A1C] px-2 py-0.5 rounded border border-[#E2D2B0]">內部工作區</span>
@@ -614,8 +664,10 @@ Day 2：嘉義樂客商旅 → 阿里山國家森林遊樂區｜約 100 分鐘">
             <label class="block text-[9px] text-[#8A8478] font-bold">車型規格</label>
             <input id="dispatch-driver-vehicle" type="text" placeholder="例如：Benz Vito 9人座" oninput="handleDriverInputChange()" class="w-full rounded border border-[#E7DFD0] px-2 py-1 text-xs bg-white font-bold text-[#1A1A18]">
           </div>
-          <div class="col-span-2 pt-0.5">
-            <button type="button" onclick="saveCurrentDriverToLibrary()" class="w-full bg-[#F4EEDF] hover:bg-[#EBE2CF] text-[#6A4F1D] border border-[#DFCFAE] rounded py-1 text-[11px] font-bold cursor-pointer">💾 確認司導並帶入後台帳務</button>
+          <div class="col-span-2 pt-0.5 grid grid-cols-2 gap-2">
+            <button type="button" onclick="saveDriverToPermanentLibrary()" class="bg-[#1A1A18] hover:bg-[#2C2B27] text-white rounded py-1.5 text-[11px] font-bold cursor-pointer">💾 儲存司機至名冊庫</button>
+            <button type="button" onclick="saveCurrentDriverToLibrary()" class="bg-[#F4EEDF] hover:bg-[#EBE2CF] text-[#6A4F1D] border border-[#DFCFAE] rounded py-1.5 text-[11px] font-bold cursor-pointer">📋 確認司導並帶入後台帳務</button>
+            <button type="button" onclick="deleteSelectedDriverFromLibrary()" class="col-span-2 border border-rose-200 text-rose-700 bg-white hover:bg-rose-50 rounded py-1 text-[11px] font-bold cursor-pointer">🗑️ 刪除目前選取的司機名冊資料</button>
           </div>
         </div>
       </div>
@@ -680,34 +732,69 @@ Day 2：嘉義樂客商旅 → 阿里山國家森林遊樂區｜約 100 分鐘">
   </div>
 </header>
 
-<!-- 2. 典雅封面卷首 -->
-<div class="parchment-card p-6 relative overflow-hidden text-center space-y-4">
-  <div class="flex justify-center items-center gap-2 text-[#8C6D37] text-xs">
-    <span>✦</span>
-    <span id="txt-hero-super" class="font-cinzel tracking-[0.25em] text-[10px] uppercase font-bold">Curated Expedition in Formosa</span>
-    <span>✦</span>
-  </div>
-
-  <div class="space-y-1">
-    <p id="txt-hero-sub" class="text-xs italic text-[#7A7468] font-playfair">Exclusive Private Charter Dossier</p>
-    <h1 id="txt-hero-title" class="text-xl sm:text-2xl font-black text-[#1A1A18] leading-snug tracking-tight">
-      <span class="block">陳先生專屬</span>
-      <span class="block mt-0.5">5天4夜 尊榮包車行程表</span>
-    </h1>
-    <p id="txt-hero-meta" class="text-[11px] text-[#8C7A60] font-sans-ui pt-1">
-      尊榮專屬：陳先生 等共 4 人 ｜ 2026.08.28 ～ 09.02
-    </p>
-  </div>
-
-  <div class="double-rule"></div>
-
-  <div class="relative h-48 sm:h-56 rounded-xl overflow-hidden shadow-xs border border-[#E7DFD0]">
-    <img id="banner-img" class="w-full h-full object-cover" src="https://raw.githubusercontent.com/tdb8053-bit/work/main/001.webp" alt="精選封面大圖">
-    <div id="banner-standard-text" class="absolute bottom-2 right-2 bg-black/65 backdrop-blur-md text-white px-3 py-1 rounded-full text-[9px] font-cinzel tracking-wider">
-      <span id="text-en" class="font-bold">FORMOSA · NATURALLY PURE</span>
+<!-- 2. 典雅復古三欄旅行票券：與下方每日行程維持同寬 -->
+<section id="ticket-hero" class="vintage-journey-ticket relative" aria-label="專屬旅程票券">
+  <div class="ticket-notch-left" aria-hidden="true"></div>
+  <div class="ticket-notch-right" aria-hidden="true"></div>
+  <div class="absolute top-2 right-3 sm:right-4 text-[6.5px] sm:text-[7.5px] font-cinzel tracking-[0.22em] text-[#A69B88] uppercase font-bold z-20">TRAVEL BETTER TOGETHER</div>
+  <div class="ticket-grid-layout">
+    <div class="p-3 sm:p-4 pr-1 sm:pr-2 flex flex-col justify-between relative z-10 min-w-0">
+      <div class="text-[#8C6D37] leading-tight text-center">
+        <span class="text-[7px] sm:text-[8px] font-cinzel font-bold tracking-[0.2em] uppercase block">TAIWAN PRIVATE CHARTER</span>
+        <span class="text-[7px] sm:text-[8px] font-cinzel font-bold tracking-[0.2em] uppercase block">JOURNEY PASS</span>
+      </div>
+      <div class="my-auto py-2 flex flex-col items-center justify-center text-center">
+        <h1 id="txt-hero-title" class="leading-none tracking-tight text-center w-full">
+          <span id="ticket-guest-name" class="block font-black text-2xl sm:text-[28px] text-[#1A1A18] tracking-tight text-center" style="font-family:'Noto Serif TC',serif;font-weight:900">貴賓 閣下</span>
+        </h1>
+        <div class="pt-2 flex items-center justify-center gap-1.5 flex-wrap text-center w-full" style="font-family:'Noto Serif TC',serif">
+          <span id="ticket-trip-days" class="text-[#8C6D37] font-black text-[18px] sm:text-[20px]">行程待確認</span>
+          <span id="ticket-trip-title" class="text-[#1A1A18] font-black text-[18px] sm:text-[20px]">台灣包車旅程</span>
+        </div>
+      </div>
+      <svg class="mountain-contour-svg" viewBox="0 0 200 80" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M10 75 C 45 45, 75 60, 110 35 C 140 15, 170 40, 195 70" stroke="#C5A059" stroke-width="1.2"></path>
+        <path d="M40 75 C 70 55, 95 65, 130 48 C 160 32, 175 48, 190 75" stroke="#C5A059" stroke-width="0.9"></path>
+        <path d="M80 75 C 105 60, 130 68, 160 55 C 175 48, 185 58, 195 75" stroke="#C5A059" stroke-width="0.7"></path>
+      </svg>
+      <div class="pt-1 relative z-10 text-center">
+        <p class="text-[7.5px] sm:text-[8px] text-[#6E685E] font-serif leading-tight whitespace-nowrap" style="font-family:'Noto Serif TC',serif">用包車，讓旅程回歸最自在的節奏</p>
+        <p class="font-cinzel text-[6.5px] sm:text-[7px] tracking-[0.18em] text-[#A69B88] uppercase pt-0.5 whitespace-nowrap">A BETTER WAY TO SEE TAIWAN</p>
+        <div class="pt-1 text-[6px] sm:text-[7px] text-[#A69B88] font-cinzel tracking-[0.14em] uppercase flex items-center justify-center gap-1 whitespace-nowrap"><span>PEOPLE</span><span>•</span><span>PLACES</span><span>•</span><span>GOOD TIMES IN TAIWAN</span></div>
+      </div>
+    </div>
+    <div class="ticket-col-divider flex flex-col items-center justify-center p-2 text-center">
+      <div class="ticket-col-notch-top" aria-hidden="true"></div><div class="ticket-col-notch-bottom" aria-hidden="true"></div>
+      <span class="text-[7px] sm:text-[8px] font-cinzel tracking-[0.2em] text-[#8C6D37] uppercase font-bold mb-1">TRAVEL DATE</span>
+      <div class="space-y-0.5 font-serif leading-tight text-center" style="font-family:'Noto Serif TC',serif">
+        <div id="ticket-start-date" class="text-xs sm:text-[13px] font-black text-[#1A1A18] tracking-tight">日期待確認</div>
+        <div class="text-[10px] text-[#8C6D37] font-bold py-0.5 leading-none">│</div>
+        <div id="ticket-end-date" class="text-xs sm:text-[13px] font-black text-[#1A1A18] tracking-tight">日期待確認</div>
+      </div>
+      <div class="w-8 border-b border-[#D8CCB8] my-1 sm:my-1.5"></div>
+      <p id="ticket-meta-subtitle" class="text-[7.5px] sm:text-[8px] text-[#6E685E] font-serif font-bold whitespace-nowrap">專屬包車</p>
+      <span id="ticket-meta-en" class="text-[6px] sm:text-[6.5px] font-cinzel text-[#A69B88] tracking-wider uppercase whitespace-nowrap mt-0.5"></span>
+    </div>
+    <div class="ticket-col-divider flex flex-col justify-between p-2 sm:p-2.5 pl-2 sm:pl-3 relative overflow-hidden">
+      <div class="ticket-col-notch-top" aria-hidden="true"></div><div class="ticket-col-notch-bottom" aria-hidden="true"></div>
+      <div class="w-full flex justify-end select-none pointer-events-none pt-2.5 pr-0.5 sm:pr-1 opacity-85">
+        <svg viewBox="0 0 110 58" class="w-16 sm:w-[72px] h-auto" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <circle cx="28" cy="28" r="24" fill="none" stroke="#9A773C" stroke-width="1.1"></circle>
+          <circle cx="28" cy="28" r="21" fill="none" stroke="#9A773C" stroke-width="0.75" stroke-dasharray="2 1.5"></circle>
+          <text x="28" y="19" font-family="'Cinzel',serif" font-size="4.2" font-weight="700" fill="#8C6D37" text-anchor="middle" letter-spacing="0.8">YUANXIANGGU</text>
+          <text x="28" y="27.5" font-family="'Cinzel',serif" font-size="4.8" font-weight="800" fill="#8C6D37" text-anchor="middle" letter-spacing="0.5">PRIVATE</text>
+          <text x="28" y="35.5" font-family="'Cinzel',serif" font-size="4.8" font-weight="800" fill="#8C6D37" text-anchor="middle" letter-spacing="0.5">TOURS</text>
+          <text x="28" y="44" font-family="'Cinzel',serif" font-size="3.6" font-weight="600" fill="#8C6D37" text-anchor="middle" letter-spacing="0.6">JOURNEY PASS</text>
+          <path d="M54 18 Q66 14 78 18 T100 18 M54 23 Q66 19 78 23 T100 23 M54 28 Q66 24 78 28 T100 28 M54 33 Q66 29 78 33 T100 33 M54 38 Q66 34 78 38 T100 38" fill="none" stroke="#9A773C" stroke-width="0.85"></path>
+        </svg>
+      </div>
+      <div class="space-y-0.5 text-[#1A1A18] w-full z-10 pb-1" style="font-family:'Noto Serif TC',serif">
+        <span class="text-[7px] sm:text-[8px] font-cinzel tracking-[0.18em] text-[#8C6D37] uppercase font-bold block mb-1">ROUTE</span>
+        <div id="ticket-route-nodes" class="space-y-0.5 text-[9px] sm:text-[10px] font-bold border-l-2 border-[#C5A059] pl-1.5 leading-snug" style="font-family:'Noto Serif TC',serif"></div>
+      </div>
     </div>
   </div>
-</div>
+</section>
 
 <!-- 3. 隨行名家司導 -->
 <section id="driver-card" class="parchment-card p-5 space-y-3.5 border-l-4 border-l-[#C5A059]">
@@ -809,6 +896,7 @@ Day 2：嘉義樂客商旅 → 阿里山國家森林遊樂區｜約 100 分鐘">
       <span id="lbl-total-fare" class="font-serif text-[#6A665E]">全程包車車資總額：</span>
       <strong id="val-total-fare" class="font-mono text-[#1A1A18] font-bold">NT$ 28,500</strong>
     </div>
+    <div id="fare-breakdown" class="rounded-xl border border-[#EFE9DD] bg-[#FAF8F5] px-3 py-2 space-y-1 text-[11px]" aria-label="每日車資明細"></div>
 
     <div id="row-collections" class="p-3 rounded-xl bg-[#FAF8F5] border border-[#EFE9DD] space-y-1.5 text-[11px]" hidden>
       <div class="flex justify-between font-bold text-[#7A5A1C] border-b border-[#EFE9DD] pb-1 font-serif">
@@ -1841,6 +1929,55 @@ function setupScrollObserver() {
 
 const confirmedDriveTimeStorageKey = 'yxg-confirmed-drive-times-v1';
 let inMemoryConfirmedRoutes = [];
+let activeCasePlaces = [];
+
+function applyCaseRoutes(routes) {
+  const validRoutes = Array.isArray(routes)
+    ? routes.filter(route => route && route.from && route.to && Number(route.mins) > 0)
+    : [];
+  let savedRoutes = [];
+  try {
+    const stored = JSON.parse(window.localStorage.getItem(confirmedDriveTimeStorageKey) || '[]');
+    savedRoutes = Array.isArray(stored) ? stored.filter(route => route && route.from && route.to && Number(route.mins) > 0) : [];
+  } catch (_) {}
+  const merged = new Map();
+  savedRoutes.forEach(route => merged.set(`${route.from}|${route.to}`, route));
+  validRoutes.forEach(route => merged.set(`${route.from}|${route.to}`, route));
+  inMemoryConfirmedRoutes = Array.from(merged.values());
+  try {
+    window.localStorage.setItem(confirmedDriveTimeStorageKey, JSON.stringify(inMemoryConfirmedRoutes));
+  } catch (_) {}
+}
+
+function applyCasePlaces(places) {
+  activeCasePlaces = Array.isArray(places)
+    ? places.filter(place => place && place.name && Number(place.stayMinutes) > 0)
+    : [];
+}
+
+// Standalone customer/driver exports cannot reload the backend case from localStorage.
+if (Array.isArray(window.__initialCasePlaces)) {
+  applyCasePlaces(window.__initialCasePlaces);
+}
+
+function getCaseAwarePlaceMatch(entryName) {
+  const normalizedEntry = normalizePlaceName(entryName);
+  const savedMatch = activeCasePlaces
+    .filter(place => {
+      const normalizedName = normalizePlaceName(place.name);
+      return normalizedName && (normalizedEntry === normalizedName || normalizedEntry.includes(normalizedName) || normalizedName.includes(normalizedEntry));
+    })
+    .sort((a, b) => String(b.name).length - String(a.name).length)[0];
+  if (savedMatch) return savedMatch;
+
+  return travelLibrary
+    .filter(item => item.keywords.some(keyword => entryName.includes(keyword)))
+    .sort((a, b) => {
+      const maxA = Math.max(...a.keywords.filter(keyword => entryName.includes(keyword)).map(keyword => keyword.length));
+      const maxB = Math.max(...b.keywords.filter(keyword => entryName.includes(keyword)).map(keyword => keyword.length));
+      return maxB - maxA;
+    })[0];
+}
 
 function getConfirmedDriveTimeLibrary() {
   const map = new Map();
@@ -1879,6 +2016,15 @@ function saveConfirmedDriveTimes(routes) {
 }
 
 const defaultKnownRoutes = [
+  { from: '嘉義高鐵站出發', to: '噴水火雞肉飯', mins: 35 },
+  { from: '噴水火雞肉飯', to: '三隻小豬觀光農場', mins: 30 },
+  { from: '三隻小豬觀光農場', to: '橘子商旅', mins: 30 },
+  { from: '橘子商旅', to: '林聰明沙鍋魚頭（終點站）', mins: 10 },
+  { from: '林聰明沙鍋魚頭（終點站）', to: '橘子商旅', mins: 10 },
+  { from: '橘子商旅', to: '優遊吧斯鄒族文化部落', mins: 125 },
+  { from: '優遊吧斯鄒族文化部落', to: '達官現炒風味餐廳', mins: 15 },
+  { from: '達官現炒風味餐廳', to: '奮起湖老街', mins: 25 },
+  { from: '奮起湖老街', to: '返回嘉義橘子商旅結束行程', mins: 120 },
   { from: '桃園國際機場', to: '嘉義樂客商旅', mins: 180 },
   { from: '桃園國際機場', to: '台北君悅酒店', mins: 50 },
   { from: '台北君悅酒店', to: '日月潭遊湖', mins: 210 },
@@ -2094,6 +2240,12 @@ function processSmartSourceText(text) {
   if (!text || !text.trim()) return;
 
   try {
+    const suppliedCaseId = window.YxgFlexibleItinerary?.confirmationId(text);
+    if (suppliedCaseId) {
+      const caseInput = document.getElementById('case-id');
+      if (caseInput) { caseInput.value = suppliedCaseId; updateOutputPreview(); }
+    }
+    text = window.YxgFlexibleItinerary?.normalize(text) || text;
     text = text.replace(/\r\n/g, '\n');
     text = text.replace(/^([^：:\n]+?)\s*[:：]\s*/gm, '$1：');
     text = text.replace(/(\d{1,2})\s*[:：]\s*(\d{2})/g, '$1:$2');
@@ -2195,12 +2347,12 @@ function processSmartSourceText(text) {
     // ✈️ 嚴格接機資訊解析與 100% 航廈對應連動 (徹底解決降落 T1 卻在 T2 等候之問題)
     const arrivalDateMatch = text.match(/(?:抵達日期|接機日期|日期)[：:]\s*([^\r\n]+)/i);
     const flightMatch = text.match(/(?:航班編號|抵達航班|航班|班機)[：:]\s*([^\r\n]+)/i);
-    const arrivalTimeMatch = text.match(/(?:抵達時間|航班抵達|降落時間|時間)[：:]\s*([^\r\n]+)/i);
+    const arrivalTimeMatch = text.match(/(?:抵達時間|航班抵達|降落時間)[：:]\s*([^\r\n]+)/i);
     const terminalMatch = text.match(/(?:抵達航廈|班機抵達航廈|接機航廈|航廈|航站)[：:]\s*([^\r\n]+)/i);
     const meetingPointMatch = text.match(/(?:迎候地點|會面地點)[：:]\s*([^\r\n]+)/i);
     const locationMatch = text.match(/(?:接機地點|機場地點)[：:]\s*([^\r\n]+)/i);
 
-    if (flightMatch || arrivalTimeMatch || text.includes('接機資訊') || text.includes('迎賓接機') || text.includes('接機')) {
+    if (window.YxgFlexibleItinerary?.hasAirportPickup(text)) {
       let rawTerminal = terminalMatch ? terminalMatch[1].trim() : '';
       let cleanTerminal = 'T1';
 
@@ -2290,6 +2442,13 @@ function processSmartSourceText(text) {
         }
 
         let stay = stayMatch ? stayMatch[1].trim() : '';
+        // A missing hotel is an internal review flag, not a real stop or map destination.
+        if (stay === '待確認飯店') stay = '';
+        const stayIsWaypoint = Boolean(stay && stayMatch && dayContent.slice(stayMatch.index + stayMatch[0].length)
+          .split(/\n/).some(line => {
+            const value = line.trim();
+            return value && !/^(?:今日車資|單日車資|車資|代訂|備註|自由活動|晚間自由活動|夜間自由活動|行程結束點)\s*[：:]/.test(value);
+          }));
 
         const freeActivities = [];
         const freeMatches = dayContent.matchAll(/(?:自由活動|晚間自由活動|夜間自由活動)[：:]\s*([^\r\n]+)/g);
@@ -2300,6 +2459,7 @@ function processSmartSourceText(text) {
         let rawLines = dayContent.split(/\n/)
           .map(l => l.trim())
           .map(l => l.replace(/^(?:行程內容|行程景點|行程項目)[：:]\s*/i, '').trim())
+          .map(l => stayIsWaypoint && stayMatch && l === stayMatch[0].trim() ? stay : l)
           .filter(l => l && !isAccountingLine(l) && !isHeaderOrDateLine(l) && !isDropoffInfoLine(l) &&
             !l.startsWith('出發起點') && !l.startsWith('出發地點') && 
             !l.startsWith('出發時間') && !l.startsWith('今日車資') && 
@@ -2314,7 +2474,7 @@ function processSmartSourceText(text) {
             !l.startsWith('行程結束點') && !l.startsWith('行程結束'));
 
         const originVal = originMatch ? originMatch[1].trim() : '';
-        rawLines = rawLines.filter(l => l !== stay && l !== originVal && !isDropoffInfoLine(l));
+        rawLines = rawLines.filter(l => (l !== stay || stayIsWaypoint) && l !== originVal && !isDropoffInfoLine(l));
 
         parsedDays[actualDayNum] = {
           departureTime,
@@ -2361,6 +2521,7 @@ function processSmartSourceText(text) {
 
     templateData.tripDays = maxDayCount > 0 ? maxDayCount : 1;
     templateData.dailyItinerary = parsedDays;
+    templateData.yuyupasSelections = {};
 
     updateDepartureDaySelect();
     renderFullCustomerPage();
@@ -2372,6 +2533,74 @@ function processSmartSourceText(text) {
     renderFullCustomerPage();
     renderRouteQueue();
     showToast('✨ 行程已完成解析與渲染！');
+  }
+}
+
+function renderDailyFareBreakdown(container, dailyItinerary, lang) {
+  if (!container) return;
+  container.replaceChildren();
+  const days = Object.keys(dailyItinerary || {}).map(Number).filter(Number.isFinite).sort((a, b) => a - b);
+  container.hidden = days.length === 0;
+  if (!days.length) return;
+  const title = document.createElement('div');
+  title.className = 'font-bold text-[#6A4F1D] border-b border-[#EFE9DD] pb-1';
+  title.textContent = lang === 'en' ? 'Daily charter fare details' : lang === 'zh-CN' ? '每日车资明细' : '每日車資明細';
+  container.appendChild(title);
+  days.forEach(day => {
+    const fare = Number(dailyItinerary[day]?.fare) || 0;
+    const row = document.createElement('div');
+    row.className = 'flex justify-between gap-2 font-mono text-[#4A463E]';
+    row.textContent = `Day ${day}：${fare > 0 ? `NT$ ${fare.toLocaleString('zh-CN')}` : (lang === 'en' ? 'Pending' : lang === 'zh-CN' ? '待补' : '待補')}`;
+    container.appendChild(row);
+  });
+}
+
+function renderVintageTicket(data, lang) {
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  const days = Math.max(1, Number(data.tripDays) || Object.keys(data.dailyItinerary || {}).length || 1);
+  const nights = Math.max(0, days - 1);
+  const rawName = String(data.customerName || '貴賓').trim();
+  const guestName = /閣下$/.test(rawName) ? rawName : `${rawName} 閣下`;
+  const simplified = typeof toSimpText === 'function' ? toSimpText : value => value;
+  setText('ticket-guest-name', lang === 'zh-CN' ? simplified(guestName) : guestName);
+  setText('ticket-trip-days', lang === 'en' ? `${days} Days ${nights} Nights` : `${days}天${nights}夜`);
+  setText('ticket-trip-title', lang === 'en' ? 'Taiwan Charter Journey' : lang === 'zh-CN' ? '台湾包车旅程' : '台灣包車旅程');
+  setText('ticket-meta-subtitle', lang === 'en' ? `${days} Days ${nights} Nights · Private Charter` : lang === 'zh-CN' ? `${days}天${nights}夜 · 专属包车` : `${days}天${nights}夜 · 專屬包車`);
+  const dateParts = value => {
+    const match = String(value || '').match(/^(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})$/);
+    if (!match) return null;
+    const year = Number(match[1]), month = Number(match[2]), day = Number(match[3]);
+    const date = new Date(year, month - 1, day);
+    return date.getFullYear() === year && date.getMonth() === month - 1 && date.getDate() === day ? { year, month, day } : null;
+  };
+  const start = dateParts(data.startDate), end = dateParts(data.endDate);
+  const dotted = parts => parts ? `${parts.year}.${String(parts.month).padStart(2, '0')}.${String(parts.day).padStart(2, '0')}` : '日期待確認';
+  setText('ticket-start-date', dotted(start));
+  setText('ticket-end-date', dotted(end));
+  const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+  setText('ticket-meta-en', start && end ? `${months[start.month - 1]} ${start.day} — ${months[end.month - 1]} ${end.day}, ${end.year}` : '');
+  const routeBox = document.getElementById('ticket-route-nodes');
+  if (routeBox) {
+    routeBox.replaceChildren();
+    const places = [];
+    const add = value => {
+      const place = String(value || '').trim();
+      if (place && !places.includes(place)) places.push(place);
+    };
+    for (const day of Object.values(data.dailyItinerary || {})) {
+      add(day.origin);
+      for (const entry of day.entries || []) add(typeof entry === 'string' ? entry.replace(/^(景點|午餐|晚餐)：\s*/, '') : entry?.name || entry?.title);
+      add(day.stay);
+    }
+    for (const [index, place] of places.slice(0, 5).entries()) {
+      const node = document.createElement('div');
+      node.className = 'pl-1.5 truncate';
+      node.textContent = `${index === 0 ? '●' : '↓'} ${place}`;
+      routeBox.appendChild(node);
+    }
   }
 }
 
@@ -2387,23 +2616,7 @@ function renderFullCustomerPage() {
     if (heroSuperEl) heroSuperEl.textContent = dict.heroSuper;
     const heroSubEl = document.getElementById('txt-hero-sub');
     if (heroSubEl) heroSubEl.textContent = dict.heroSub;
-    const heroTitleEl = document.getElementById('txt-hero-title');
-    if (heroTitleEl) {
-      const days = templateData.tripDays || 2;
-      const nights = days > 1 ? days - 1 : 1;
-      const guestName = templateData.customerName || '貴賓';
-      if (currentLang === 'en') {
-        heroTitleEl.innerHTML = `<span class="block">Curated Voyage for ${guestName}</span><span class="block mt-0.5">${days} Days ${nights} Nights Charter</span>`;
-      } else if (currentLang === 'zh-CN') {
-        heroTitleEl.innerHTML = `<span class="block">${toSimpText(guestName)}专属</span><span class="block mt-0.5">${days}天${nights}夜 尊荣包车行程表</span>`;
-      } else {
-        heroTitleEl.innerHTML = `<span class="block">${guestName}專屬</span><span class="block mt-0.5">${days}天${nights}夜 尊榮包車行程表</span>`;
-      }
-    }
-    const heroMetaEl = document.getElementById('txt-hero-meta');
-    if (heroMetaEl) {
-      heroMetaEl.textContent = `${dict.customerPartyLbl} ${localizeDynamicText(templateData.customerParty) || '貴賓'} ｜ ${templateData.startDate || '2026.08.28'} ～ ${templateData.endDate || '2026.09.02'}`;
-    }
+    renderVintageTicket(templateData, currentLang);
 
     const chTag = document.getElementById('txt-chauffeur-tag');
     if (chTag) chTag.textContent = dict.chauffeurTag;
@@ -2500,6 +2713,7 @@ function renderFullCustomerPage() {
       dayCard.appendChild(header);
 
       const cleanEntries = (itinerary.entries || []).filter(e => !isAccountingLine(e) && !isHeaderOrDateLine(e) && !isDropoffInfoLine(e));
+      const hotelWasVisited = Boolean(itinerary.stay && cleanEntries.includes(itinerary.stay));
       const depTimeText = window.YxgSchedule.departure({ ...itinerary, entries: cleanEntries });
 
       const isPickupDay = (Number(dayNumber) === 1 && Boolean(templateData.pickupInfo));
@@ -2561,15 +2775,11 @@ function renderFullCustomerPage() {
         currentClockMins += travelInfo.mins;
         const isDropoffSpot = entryName.includes('送機') || entryName.includes('離境');
         const isNightMarket = isNightMarketSpot(entryName);
-        const isLastSpotOfDay = (idx === cleanEntries.length - 1 && !itinerary.stay);
+        const isLastSpotOfDay = (idx === cleanEntries.length - 1 && (!itinerary.stay || hotelWasVisited));
+        const isTerminalStop = idx === cleanEntries.length - 1 && window.YxgSchedule.isTerminal(entryName);
+        const isHotelWaypoint = hotelWasVisited && entryName === itinerary.stay;
 
-        const libMatch = travelLibrary
-          .filter(item => item.keywords.some(k => entryName.includes(k)))
-          .sort((a, b) => {
-            const maxA = Math.max(...a.keywords.filter(k => entryName.includes(k)).map(k => k.length));
-            const maxB = Math.max(...b.keywords.filter(k => entryName.includes(k)).map(k => k.length));
-            return maxB - maxA;
-          })[0];
+        const libMatch = getCaseAwarePlaceMatch(entryName);
 
         if (previousSpot && entryName && normalizePlaceName(previousSpot) !== normalizePlaceName(entryName)) {
           const driveBadge = document.createElement('div');
@@ -2593,21 +2803,24 @@ function renderFullCustomerPage() {
         const card = document.createElement('div');
         card.className = 'p-3.5 rounded-xl bg-[#FAF8F5] border border-[#EFE9DD] space-y-2';
 
-        const timing = window.YxgSchedule.spot(itinerary, entryName, currentClockMins, getSpotStayMinutes(entryName, libMatch));
+        const yuyupasShow = window.YxgYuyupas?.isPlace(entryName)
+          ? window.YxgYuyupas.scheduleFor(templateData.startDate, Number(dayNumber) - 1, templateData.yuyupasSelections?.[dayNumber] === 'afternoon' ? 'afternoon' : 'morning')
+          : null;
+        const timing = window.YxgSchedule.spot(itinerary, entryName, currentClockMins, isHotelWaypoint ? 20 : getSpotStayMinutes(entryName, libMatch), yuyupasShow?.start || '');
         const stayMins = timing.stayMinutes;
         const meetingClockMins = timing.meetingMins;
 
         const titleEl = document.createElement('h4');
         titleEl.className = 'text-sm font-bold font-serif text-[#1A1A18]';
         const cardTitle = (entryName && entryName.trim()) ? entryName.trim() : (libMatch ? libMatch.displayName : entryName);
-        titleEl.textContent = `📍 ${localizeDynamicText(cardTitle)}`;
+        titleEl.textContent = `${isHotelWaypoint ? '🏨' : '📍'} ${localizeDynamicText(cardTitle)}`;
         card.appendChild(titleEl);
 
-        if (!isDropoffSpot) {
+        if (!isDropoffSpot && !isTerminalStop) {
           const scheduleBar = document.createElement('div');
           scheduleBar.className = 'time-schedule-bar';
           scheduleBar.innerHTML = `
-            <span>${timing.fixed ? localizeDynamicText('依指定集合時間安排停留') : `${dict.stayPrefix}${stayMins} ${dict.stayUnit}`}</span>
+            <span>${timing.fromPerformanceStart ? localizeDynamicText('表演起算約 120 分鐘') : timing.fixed ? localizeDynamicText('依指定集合時間安排停留') : `${dict.stayPrefix}${stayMins} ${dict.stayUnit}`}</span>
             <span class="text-rose-700 font-bold border-l border-[#E2D2B0] pl-2">${dict.meetingTimePrefix}${timing.meetingText}</span>
           `;
           card.appendChild(scheduleBar);
@@ -2627,7 +2840,7 @@ function renderFullCustomerPage() {
 
         const desc = document.createElement('p');
         desc.className = 'text-xs text-[#5A5954] leading-relaxed font-serif';
-        const rawDesc = libMatch?.description || (isDropoffSpot ? '辦妥登機手續、托運行李與安檢出境。' : `精選景點參觀與私旅體驗：${entryName}`);
+        const rawDesc = isHotelWaypoint ? '先至飯店安置行李，再繼續後續行程。' : libMatch?.description || (isDropoffSpot ? '辦妥登機手續、托運行李與安檢出境。' : `精選景點參觀與私旅體驗：${entryName}`);
         desc.textContent = localizeDynamicText(rawDesc);
         card.appendChild(desc);
 
@@ -2659,7 +2872,7 @@ function renderFullCustomerPage() {
         currentClockMins = meetingClockMins;
       });
 
-      if (itinerary.stay) {
+      if (itinerary.stay && !hotelWasVisited) {
         const stayTravel = getEstimatedTravelTime(previousSpot, itinerary.stay);
         const arrivalHotelMins = currentClockMins + stayTravel.mins;
 
@@ -2759,6 +2972,7 @@ function renderFullCustomerPage() {
     }
     const valTotalFare = document.getElementById('val-total-fare');
     if (valTotalFare) valTotalFare.textContent = `NT$ ${fareVal.toLocaleString('zh-CN')}`;
+    renderDailyFareBreakdown(document.getElementById('fare-breakdown'), templateData.dailyItinerary, currentLang);
 
     const collectionVal = templateData.collectionTotal || 0;
     const valCollectionTotal = document.getElementById('val-collection-total');
@@ -2893,6 +3107,7 @@ function prepareCustomerHtmlContent() {
 
   const genPanel = doc.getElementById('generator-panel');
   if (genPanel) genPanel.remove();
+  doc.querySelectorAll('.yuyupas-slot-control').forEach(control => control.remove());
   const auditModal = doc.getElementById('audit-modal-backdrop');
   if (auditModal) auditModal.remove();
   const deliveryModal = doc.getElementById('delivery-success-modal');
@@ -2901,6 +3116,7 @@ function prepareCustomerHtmlContent() {
   const standaloneScript = doc.createElement('script');
   standaloneScript.textContent = `
     window.__initialTripData = ${JSON.stringify(templateData).replace(/</g, '\\u003c')};
+    window.__initialCasePlaces = ${JSON.stringify(activeCasePlaces).replace(/</g, '\\u003c')};
     window.__isCustomerDelivery = true;
   `;
   doc.head.insertBefore(standaloneScript, doc.head.firstChild);
@@ -2916,6 +3132,7 @@ function prepareDriverDispatchHtmlContent() {
 
   const genPanel = doc.getElementById('generator-panel');
   if (genPanel) genPanel.remove();
+  doc.querySelectorAll('.yuyupas-slot-control').forEach(control => control.remove());
   const auditModal = doc.getElementById('audit-modal-backdrop');
   if (auditModal) auditModal.remove();
   const deliveryModal = doc.getElementById('delivery-success-modal');
@@ -2973,6 +3190,7 @@ function prepareDriverDispatchHtmlContent() {
   const standaloneDriverScript = doc.createElement('script');
   standaloneDriverScript.textContent = `
     window.__initialTripData = ${JSON.stringify(templateData).replace(/</g, '\\u003c')};
+    window.__initialCasePlaces = ${JSON.stringify(activeCasePlaces).replace(/</g, '\\u003c')};
     window.__isDriverDispatch = true;
   `;
   doc.head.insertBefore(standaloneDriverScript, doc.head.firstChild);
@@ -3236,6 +3454,13 @@ const defaultDriverList = [
   { name: '陳建榮', phone: '+886928888032', plate: 'TDC-8053', vehicle: '九人座商務車' }
 ];
 
+function getHiddenDefaultDriverKeys() {
+  try {
+    const saved = JSON.parse(localStorage.getItem('yxg:v2:hidden-default-drivers') || '[]');
+    return Array.isArray(saved) ? saved : [];
+  } catch (_) { return []; }
+}
+
 function initDriverSelect() {
   const sel = document.getElementById('dispatch-driver-select');
   if (!sel) return;
@@ -3243,15 +3468,17 @@ function initDriverSelect() {
     <option value="none">尚未指派（出發前通知）</option>
     <option value="custom">✏️ 手動輸入／新增司機</option>
   `;
+  const hiddenDefaults = getHiddenDefaultDriverKeys();
   defaultDriverList.forEach((d, idx) => {
+    if (hiddenDefaults.includes(`${d.name}|${d.plate}`)) return;
     const opt = document.createElement('option');
     opt.value = `lib_${idx}`;
-    opt.textContent = `🚕 ${d.name} (${d.plate})`;
+    opt.textContent = `🚕 ${d.name} (${d.plate}) · 預設`;
     sel.appendChild(opt);
   });
   if (templateData.driver && templateData.driver.name) {
     const idx = defaultDriverList.findIndex(d => d.name === templateData.driver.name);
-    if (idx >= 0) {
+    if (idx >= 0 && !hiddenDefaults.includes(`${defaultDriverList[idx].name}|${defaultDriverList[idx].plate}`)) {
       sel.value = `lib_${idx}`;
     } else {
       sel.value = 'custom';
@@ -3584,9 +3811,9 @@ window.onload = function() {
       document.getElementById('case-id').value = record.id;
       document.getElementById('smart-source-input').value = record.standardText;
       localStorage.setItem(ACTIVE_KEY, record.id);
+      applyCasePlaces(record.places);
+      applyCaseRoutes(record.routes || safeJson(localStorage.getItem(ROUTES_KEY), []));
       legacyProcess(cleanMoneyText(record.standardText));
-      const routes = record.routes || safeJson(localStorage.getItem(ROUTES_KEY), []);
-      if (Array.isArray(routes)) { localStorage.setItem('yxg-confirmed-drive-times-v1', JSON.stringify(routes)); inMemoryConfirmedRoutes = routes; }
       const dropoff = record.standardText.match(/送機資訊([\s\S]*)$/i)?.[1] || '';
       if (dropoff) templateData.dropoffInfo = { dropoffDate: (dropoff.match(/送機日期[：:]\s*([^\r\n]+)/)?.[1] || templateData.endDate).trim().replace(/\//g, '-'), flight: (dropoff.match(/(?:起飛航班編號|航班編號)[：:]\s*([^\r\n]+)/)?.[1] || '').trim(), departureTime: (dropoff.match(/起飛時間[：:]\s*([^\r\n]+)/)?.[1] || '').trim(), terminal: (dropoff.match(/出發航廈[：:]\s*([^\r\n]+)/)?.[1] || 'T1').trim(), location: (dropoff.match(/送機地點[：:]\s*([^\r\n]+)/)?.[1] || '桃園國際機場').trim() };
       templateData.driver = record.driver || null;
@@ -3601,7 +3828,14 @@ window.onload = function() {
     window.saveGeneratorCaseState = function(status) {
       const id = document.getElementById('case-id')?.value.trim(); const record = id && loadCase(id); if (!record) return null;
       const driver = templateData.driver || null;
-      if (driver?.name) { const drivers = safeJson(localStorage.getItem(DRIVERS_KEY), []); if (!drivers.some(d => d.name === driver.name && d.plate === driver.plate)) localStorage.setItem(DRIVERS_KEY, JSON.stringify([...drivers, driver])); }
+      if (driver?.name) {
+        const drivers = safeJson(localStorage.getItem(DRIVERS_KEY), []);
+        if (Array.isArray(drivers)) {
+          const index = drivers.findIndex(item => item?.name === driver.name);
+          if (index >= 0) drivers[index] = driver; else drivers.push(driver);
+          localStorage.setItem(DRIVERS_KEY, JSON.stringify(drivers));
+        }
+      }
       return saveCase({ id, driver, status: status || record.status, generatorSnapshot: { totalFare: templateData.totalFare, deposit: templateData.deposit, totalPayable: templateData.totalPayable } });
     };
     const legacyDriverChange = handleDriverInputChange;
@@ -3614,14 +3848,82 @@ window.onload = function() {
       } else legacyDriverSelect(value);
       window.saveGeneratorCaseState(value === 'none' ? 'ready-for-generator' : 'driver-assigned');
     };
+    window.saveDriverToPermanentLibrary = function() {
+      const read = id => document.getElementById(id)?.value.trim() || '';
+      const driver = {
+        name: read('dispatch-driver-name'),
+        phone: read('dispatch-driver-phone'),
+        plate: read('dispatch-driver-plate'),
+        vehicle: read('dispatch-driver-vehicle')
+      };
+      if (!driver.name) { showToast('請先填寫司導姓名。', true); return false; }
+      try {
+        const drivers = safeJson(localStorage.getItem(DRIVERS_KEY), []);
+        if (!Array.isArray(drivers)) throw new Error('司機名冊資料格式無效');
+        const index = drivers.findIndex(item => item?.name === driver.name);
+        if (index >= 0) drivers[index] = driver;
+        else drivers.push(driver);
+        localStorage.setItem(DRIVERS_KEY, JSON.stringify(drivers));
+        templateData.driver = driver;
+        enhanceDriverSelect();
+        const select = document.getElementById('dispatch-driver-select');
+        if (select) select.value = `saved_${index >= 0 ? index : drivers.length - 1}`;
+        syncDriverInputs();
+        renderFullCustomerPage();
+        showToast(`司導「${driver.name}」已儲存至本機名冊庫。`);
+        return true;
+      } catch (error) {
+        showToast(`司機名冊儲存失敗：${error.message}`, true);
+        return false;
+      }
+    };
+    window.deleteSelectedDriverFromLibrary = function() {
+      const select = document.getElementById('dispatch-driver-select');
+      const selected = select?.value || '';
+      const saved = /^saved_\d+$/.test(selected);
+      const builtIn = /^lib_\d+$/.test(selected);
+      if (!saved && !builtIn) { showToast('請先從選單選取要刪除的司機。', true); return false; }
+      const index = Number(selected.split('_')[1]);
+      const drivers = safeJson(localStorage.getItem(DRIVERS_KEY), []);
+      const driver = saved ? (Array.isArray(drivers) ? drivers[index] : null) : defaultDriverList[index];
+      if (!driver?.name) { showToast('找不到選取的司機，請重新整理名冊。', true); return false; }
+      const details = [driver.name, driver.plate, driver.phone].filter(Boolean).join('／');
+      if (!window.confirm(`確定從司機名冊刪除「${details}」？\n\n只移除名冊，不會刪除已建立的案件與帳務紀錄。`)) return false;
+      try {
+        if (saved) {
+          drivers.splice(index, 1);
+          localStorage.setItem(DRIVERS_KEY, JSON.stringify(drivers));
+        } else {
+          const key = `${driver.name}|${driver.plate}`;
+          const hidden = getHiddenDefaultDriverKeys();
+          if (!hidden.includes(key)) hidden.push(key);
+          localStorage.setItem('yxg:v2:hidden-default-drivers', JSON.stringify(hidden));
+        }
+        window.refreshDriverLibraryOptions();
+        showToast(`已從名冊移除「${driver.name}」；既有案件與帳務不變。`);
+        return true;
+      } catch (error) {
+        showToast(`刪除司機名冊失敗：${error.message}`, true);
+        return false;
+      }
+    };
     window.saveCurrentDriverToLibrary = function() { const saved = window.saveGeneratorCaseState('driver-assigned'); showToast(saved ? '司導已存入案件與本機名冊。' : '請先由後台載入案件。', !saved); };
     const enhanceDriverSelect = () => {
       const select = document.getElementById('dispatch-driver-select'); if (!select) return;
+      select.querySelectorAll('option[value^="saved_"]').forEach(option => option.remove());
       const drivers = safeJson(localStorage.getItem(DRIVERS_KEY), []);
       drivers.forEach((driver, index) => {
         const value = `saved_${index}`;
-        if (!select.querySelector(`option[value="${value}"]`)) { const option = document.createElement('option'); option.value = value; option.textContent = `🚕 ${driver.name} (${driver.plate || '未填車牌'})`; select.appendChild(option); }
+        let option = select.querySelector(`option[value="${value}"]`);
+        if (!option) { option = document.createElement('option'); option.value = value; select.appendChild(option); }
+        option.textContent = `🚕 ${driver.name} (${driver.plate || '未填車牌'}) · 自存`;
       });
+    };
+    window.refreshDriverLibraryOptions = function() {
+      initDriverSelect();
+      enhanceDriverSelect();
+      const select = document.getElementById('dispatch-driver-select');
+      if (select) select.value = templateData.driver?.name ? 'custom' : 'none';
     };
     window.generateAndSaveCustomerPackage = async function() {
       const id = document.getElementById('case-id')?.value.trim(), record = id && loadCase(id), check = validateCaseForDelivery(record);
@@ -3826,6 +4128,8 @@ window.YxgSchedule = (() => {
   const isLake = value => /日月潭[遊游]湖|搭船[遊游]湖|水社碼頭[遊游]湖/.test(String(value || ''));
   const isFarm = value => /清境農場|青青草原|觀山牧區/.test(String(value || ''));
   const isRail = value => /勝興.*(?:鐵(?:道|路)自行車|腳踏(?:火車|車))|舊山線.*(?:自行車|腳踏火車)|鐵(?:道|路)自行車/.test(String(value || ''));
+  const isYuyupas = value => /優[遊游]吧斯|YUYUPAS|茅達諾(?:劇團|劇場)/i.test(String(value || ''));
+  const isTerminal = value => /(?:行程)?終點站|結束行程|包車任務結束/.test(String(value || ''));
   const both = day => (day.entries || []).some(isLake) && (day.entries || []).some(isFarm);
   const clock = value => {
     const match = String(value || '').trim().match(/^(\d{1,2}):(\d{2})$/);
@@ -3838,7 +4142,7 @@ window.YxgSchedule = (() => {
     return clock(value) === null ? '' : value;
   };
   const departure = day => both(day) ? '08:00 出發' : String(day.departureTime || '09:00 出發');
-  const spot = (day, entry, arrivalMinutes, defaultStayMinutes) => {
+  const spot = (day, entry, arrivalMinutes, defaultStayMinutes, performanceStart = '') => {
     let meetingMinutes = arrivalMinutes + defaultStayMinutes;
     let stayMinutes = defaultStayMinutes;
     let pending = false;
@@ -3854,10 +4158,16 @@ window.YxgSchedule = (() => {
         if (arrivalMinutes > booked - 30) warning = '抵達時間晚於預約班次前 30 分鐘，請調整行程或班次';
       }
     }
+    if (isYuyupas(entry)) {
+      stayMinutes = 120;
+      const start = clock(performanceStart);
+      if (start === null) pending = true;
+      else meetingMinutes = start + 120;
+    }
     if (!pending && !isRail(entry) && meetingMinutes < arrivalMinutes) warning = '預估抵達時間晚於指定集合時間，請調整路線';
-    return { meetingMins: meetingMinutes, meetingText: pending ? '預約時間待確認' : display(meetingMinutes), stayMinutes, fixed: isLake(entry) || isFarm(entry), pending, warning };
+    return { meetingMins: meetingMinutes, meetingText: pending ? (isYuyupas(entry) ? '表演場次待確認' : '預約時間待確認') : display(meetingMinutes), stayMinutes, fixed: isLake(entry) || isFarm(entry), fromPerformanceStart: isYuyupas(entry), pending, warning };
   };
-  return { departure, spot, isRail, bookingFromDayText };
+  return { departure, spot, isRail, isTerminal, bookingFromDayText };
 })();
 </script>
 <script>
@@ -3907,6 +4217,190 @@ window.YxgSchedule = (() => {
     window.saveGeneratorCaseState?.('driver-assigned');
     return window.confirmDriverFinanceHandoff();
   };
+})();
+</script>
+<script>
+/* yxg-ticket-yuyupas-v1 */
+(() => {
+  const isPlace = value => /優[遊游]吧斯|YUYUPAS|茅達諾(?:劇團|劇場)/i.test(String(value || ''));
+  const clockText = minutes => `${String(Math.floor(minutes / 60)).padStart(2, '0')}:${String(minutes % 60).padStart(2, '0')}`;
+  const scheduleFor = (startDate, dayOffset, slot = 'morning') => {
+    const match = String(startDate || '').trim().match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})$/);
+    if (!match || !Number.isInteger(Number(dayOffset)) || Number(dayOffset) < 0) return null;
+    const year = Number(match[1]);
+    const month = Number(match[2]);
+    const day = Number(match[3]);
+    const base = new Date(Date.UTC(year, month - 1, day));
+    if (base.getUTCFullYear() !== year || base.getUTCMonth() !== month - 1 || base.getUTCDate() !== day) return null;
+    base.setUTCDate(base.getUTCDate() + Number(dayOffset));
+    const saturday = base.getUTCDay() === 6;
+    const afternoon = slot === 'afternoon';
+    const startMinutes = afternoon ? (saturday ? 14 * 60 + 30 : 14 * 60) : (saturday ? 11 * 60 + 30 : 11 * 60);
+    return {
+      period: afternoon ? '下午場' : '上午場',
+      start: clockText(startMinutes),
+      end: clockText(startMinutes + 40),
+      enterBy: clockText(startMinutes - 30)
+    };
+  };
+  const routeItems = dailyItinerary => {
+    const days = Object.entries(dailyItinerary || {}).sort(([a], [b]) => Number(a) - Number(b)).map(([, day]) => day);
+    const useful = value => value && !/(?:餐廳|午餐|晚餐|雞肉飯|魚頭|待確認|行程待補|^[:：]?20\d{2}|^行程路線)/.test(String(value));
+    if (days.length > 2) return days.map(day => (day.entries || []).find(useful) || day.origin || day.stay || '').filter(useful).slice(0, 5);
+    const selected = days.flatMap(day => [day.origin, (day.entries || []).find(useful)]).filter(useful);
+    const more = days.flatMap(day => (day.entries || []).filter(useful).slice(1));
+    return [...new Set([...selected, ...more])].slice(0, 5);
+  };
+  const cardMarkup = (schedule, editable = false, dayNumber = 1, slot = 'morning') => {
+    const selector = editable ? `<label class="yuyupas-slot-control">表演場次：<select data-yuyupas-day="${Number(dayNumber)}"><option value="morning"${slot !== 'afternoon' ? ' selected' : ''}>上午場</option><option value="afternoon"${slot === 'afternoon' ? ' selected' : ''}>下午場</option></select></label>` : '';
+    const showStart = schedule ? Number(schedule.start.slice(0, 2)) * 60 + Number(schedule.start.slice(3, 5)) : 0;
+    const meeting = schedule ? `<div class="time-schedule-bar"><span>表演起算約 120 分鐘</span><span class="text-rose-700 font-bold">⏰ 集合時間：${clockText(showStart + 120)}</span></div>` : '';
+    const alerts = schedule
+      ? `<p class="yuyupas-alert">茅達諾劇團｜${schedule.period} ${schedule.start}–${schedule.end}</p><p class="yuyupas-alert">請於 ${schedule.enterBy} 前進入園區，預留前往劇場及就座時間。</p>`
+      : '<p class="yuyupas-alert">表演場次待確認：請先核對包車日期。</p>';
+    return `<section class="yuyupas-card" data-yuyupas-card="${Number(dayNumber)}"><h4>優遊吧斯・阿里山鄒族文化部落</h4><p>走進阿里山樂野部落，在山林間認識鄒族文化。旅客可於茅達諾劇場欣賞文化展演，並走訪文史館與傳統家屋，感受部落的故事與生活。</p>${selector}${alerts}${meeting}<p>演出地點：園區茅達諾劇場｜嘉義縣阿里山鄉樂野村4鄰127-2號｜05-2562788</p><p>場次可能因天候或園區營運調整，出發前請向園區確認。</p></section>`;
+  };
+  window.YxgYuyupas = { isPlace, scheduleFor, routeItems, cardMarkup };
+  if (typeof document === 'undefined' || !document.querySelectorAll || !window.addEventListener) return;
+
+  const readData = () => typeof templateData === 'undefined' ? null : templateData;
+  const showTicket = () => {
+    const data = readData();
+    if (!data) return;
+    const formatDate = value => String(value || '').replace(/\//g, '-').replace(/-/g, '.');
+    const start = document.getElementById('ticket-start-date');
+    const end = document.getElementById('ticket-end-date');
+    const daysLabel = document.getElementById('ticket-days-label');
+    const route = document.getElementById('ticket-route');
+    if (start) start.textContent = formatDate(data.startDate) || '日期待確認';
+    if (end) end.textContent = formatDate(data.endDate) || '日期待確認';
+    const days = Number(data.tripDays) || Object.keys(data.dailyItinerary || {}).length || 1;
+    const nights = Math.max(0, days - 1);
+    const lang = typeof currentLang === 'undefined' ? 'zh-TW' : currentLang;
+    if (daysLabel) daysLabel.textContent = lang === 'en' ? `${days} Days ${nights} Nights · Private Charter` : lang === 'zh-CN' ? `${days}天${nights}夜・专属包车旅程` : `${days}天${nights}夜・專屬包車旅程`;
+    const routeLabel = document.getElementById('ticket-route-label');
+    if (routeLabel) routeLabel.textContent = lang === 'en' ? 'Journey Route' : lang === 'zh-CN' ? '行程路线' : '行程路線';
+    if (route) {
+      route.replaceChildren();
+      for (const place of routeItems(data.dailyItinerary)) {
+        const item = document.createElement('li');
+        item.textContent = typeof localizeDynamicText === 'function' ? localizeDynamicText(place) : place;
+        route.appendChild(item);
+      }
+    }
+  };
+  const showCards = () => {
+    const data = readData();
+    if (!data) return;
+    for (const dayCard of document.querySelectorAll('#itinerary-days-container > article[data-itinerary-day]')) {
+      const dayNumber = Number(dayCard.dataset.itineraryDay);
+      const day = data.dailyItinerary?.[dayNumber];
+      const oldCard = dayCard.querySelector('[data-yuyupas-card]');
+      if (!day || !(day.entries || []).some(isPlace)) {
+        oldCard?.remove();
+        continue;
+      }
+      const slot = data.yuyupasSelections?.[dayNumber] === 'afternoon' ? 'afternoon' : 'morning';
+      const schedule = scheduleFor(data.startDate, dayNumber - 1, slot);
+      const editable = !window.__isCustomerDelivery && !window.__isDriverDispatch;
+      const markup = cardMarkup(schedule, editable, dayNumber, slot);
+      const placeTitle = [...dayCard.querySelectorAll('h4')].find(title => !title.closest('[data-yuyupas-card]') && isPlace(title.textContent));
+      const placeCard = placeTitle?.parentElement;
+      const links = oldCard?.querySelector('.grid.grid-cols-2')?.outerHTML || placeCard?.querySelector('.grid.grid-cols-2')?.outerHTML || '';
+      const completeMarkup = markup.replace('</section>', `${links}</section>`);
+      if (oldCard?.outerHTML === completeMarkup) continue;
+      if (oldCard) oldCard.outerHTML = completeMarkup;
+      else if (placeCard) placeCard.outerHTML = completeMarkup;
+      else dayCard.insertAdjacentHTML('beforeend', completeMarkup);
+    }
+  };
+  document.addEventListener('change', event => {
+    const select = event.target.closest?.('select[data-yuyupas-day]');
+    if (!select) return;
+    const data = readData();
+    if (!data) return;
+    data.yuyupasSelections ||= {};
+    data.yuyupasSelections[Number(select.dataset.yuyupasDay)] = select.value === 'afternoon' ? 'afternoon' : 'morning';
+    window.renderFullCustomerPage?.();
+  });
+  const originalRender = window.renderFullCustomerPage;
+  if (typeof originalRender === 'function') {
+    window.renderFullCustomerPage = function(...args) {
+      const result = originalRender.apply(this, args);
+      showTicket();
+      showCards();
+      return result;
+    };
+  }
+  window.addEventListener('load', () => { showTicket(); showCards(); });
+})();
+</script>
+<script>
+/* yxg-flexible-itinerary-v1 */
+window.YxgFlexibleItinerary = (() => {
+  const hasAirportPickup = text => /接機資訊|接機地點|迎賓接機|抵達航班|抵達時間|航班抵達|降落時間|機場.{0,8}接機|接機.{0,8}機場/i.test(String(text || ''));
+  const confirmationId = text => String(text || '').match(/確認單編號\s*[：:]\s*([A-Za-z0-9_-]+)/)?.[1] || '';
+  const sumDailyFares = text => [...String(text || '').matchAll(/^(?:今日車資|單日車資|車資)\s*[：:]\s*(?:NT\$|\$)?\s*([\d,]+)/gm)]
+    .reduce((sum, match) => sum + Number(match[1].replace(/,/g, '')), 0);
+  const dateOf = text => {
+    const m = String(text || '').match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+    if (!m) return '';
+    const date = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    if (date.getUTCFullYear() !== +m[1] || date.getUTCMonth() !== +m[2] - 1 || date.getUTCDate() !== +m[3]) return '';
+    return `${m[1]}/${m[2].padStart(2, '0')}/${m[3].padStart(2, '0')}`;
+  };
+  const departureClock = value => {
+    const m = String(value || '').match(/(\d{1,2})(?::(\d{2})|點(\d{1,2})?分?)/);
+    if (!m) return '待確認';
+    let hour = +m[1];
+    if (/下午/.test(value) && hour < 12) hour += 12;
+    if (/上午/.test(value) && hour === 12) hour = 0;
+    const minute = +(m[2] || m[3] || 0);
+    return hour < 24 && minute < 60 ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}` : '待確認';
+  };
+  const normalize = input => {
+    const source = String(input || '').replace(/\r\n/g, '\n').replace(/&#x20;|\u00a0/g, ' ').replace(/\\\s*\n/g, '\n').trim();
+    const labeled = [...source.matchAll(/^\s*Day\s*(\d+)\s*[：:]\s*(20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日)[^\n]*/gim)]
+      .map(m => ({ number: +m[1], date: dateOf(m[2]), from: m.index, after: m.index + m[0].length }));
+    const dated = [...source.matchAll(/20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日\s*(?:[（(]?星期[一二三四五六日天][）)]?)?/g)]
+      .map((m, i) => ({ number: i + 1, date: dateOf(m[0]), from: m.index, after: m.index + m[0].length }));
+    const headers = labeled.length ? labeled : dated;
+    if (!headers.length || headers.some((h, i) => !h.date || h.number !== i + 1)) return source;
+    const meta = source.slice(0, headers[0].from);
+    const name = meta.match(/(?:客人資料姓名|預約代表|姓名)\s*[：:]\s*([^\s：:]+)/)?.[1] || '貴賓';
+    const adults = +(meta.match(/(\d+)\s*位?大人/)?.[1] || 0);
+    const children = +(meta.match(/(\d+)\s*(?:位?小孩|位?兒童)/)?.[1] || 0);
+    const count = adults + children;
+    const phone = (meta.match(/(?:聯絡電話|電話)\s*[：:]\s*([+\d][+\d\s-]{7,})/)?.[1] || '').trim();
+    const days = headers.map((head, i) => {
+      const body = source.slice(head.after, headers[i + 1]?.from ?? source.length).trim();
+      const combined = body.match(/出發時間\s*\/\s*地點\s*[：:]\s*([\s\S]*?)(?=\s+行程\s*[：:]|$)/)?.[1]?.trim() || '';
+      const timeText = body.match(/(?:^|\n)\s*出發時間\s*[：:]\s*([^\n]+)/)?.[1] || combined;
+      const origin = body.match(/(?:^|\n)\s*出發地點\s*[：:]\s*([^\n]+)/)?.[1]?.trim() ||
+        combined.replace(/^\s*(?:上午|下午)?[、,\s]*\d{1,2}(?:[:：]\d{2}|點(?:\d{1,2}分?)?)\s*出發\s*/, '').trim();
+      const stay = body.match(/(?:^|\n)\s*住宿飯店\s*[：:]\s*([^\n]+)/)?.[1]?.trim() || '待確認飯店';
+      const fare = +(body.match(/(?:單日車資|今日車資|車資)\s*[：:]\s*(?:NT\$|\$)?\s*([\d,]+)/)?.[1] || '').replace(/,/g, '');
+      const compactRoute = body.match(/(?:^|\s)行程\s*[：:]\s*([\s\S]*?)(?=\s+(?:單日車資|今日車資|車資)\s*[：:]|$)/)?.[1];
+      const routeLines = body.split('\n').map(value => value.trim());
+      const hotelIndex = routeLines.findIndex(value => /^住宿飯店\s*[：:]/.test(value));
+      const hotelIsWaypoint = hotelIndex >= 0 && routeLines.slice(hotelIndex + 1).some(value =>
+        value && !/^(?:單日車資|今日車資|車資|備註|代訂)\s*[：:]/.test(value));
+      const entries = compactRoute
+        ? compactRoute.split(/[～→➔]/).map(v => v.trim()).filter(v => v && !/^(?:.+出發|飯店放行李|嘉義住宿)$/.test(v))
+        : routeLines.filter(v => v && !/^(?:出發時間|出發地點|單日車資|今日車資|車資|行程路線)\s*[：:]/.test(v) && (hotelIsWaypoint || !/^住宿飯店\s*[：:]/.test(v)))
+          .map(v => v.replace(/^(?:景點|午餐|晚餐)\s*[：:]\s*/, '').trim()).filter(Boolean);
+      return { date: head.date, origin, time: departureClock(timeText), stay, fare, entries, hotelIsWaypoint };
+    });
+    const total = days.reduce((sum, day) => sum + (day.fare || 0), 0);
+    const lines = [
+      `包車開始日期：${days[0].date}`, `包車結束日期：${days[days.length - 1].date}`,
+      `預約代表：${name}${count ? ` 等共 ${count} 人` : ''}`, `聯絡電話：${phone}`
+    ];
+    if (total && days.every(day => day.fare)) lines.unshift(`總車資：${total}`);
+    days.forEach((day, i) => lines.push('', `Day ${i + 1}`, `出發地點：${day.origin || (i ? days[i - 1].stay : '待確認出發點')}`, `出發時間：${day.time}`, '行程內容：', ...(day.entries.length ? day.entries : ['行程待補']), ...(!day.hotelIsWaypoint ? [`住宿飯店：${day.stay}`] : []), `今日車資：${day.fare || '待補'}`));
+    return lines.join('\n').trim();
+  };
+  return { hasAirportPickup, confirmationId, sumDailyFares, normalize };
 })();
 </script>
 </body>
