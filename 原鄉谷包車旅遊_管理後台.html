@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>原鄉谷包車旅遊｜管理後台 v0.9.6</title>
+  <title>原鄉谷包車旅遊｜管理後台 v0.9.8</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Noto+Serif+TC:wght@400;600;700;900&family=Playfair+Display:ital,wght@0,600;0,800;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -867,7 +867,7 @@ Day 2
           <article class="stat"><span>待確認訂單</span><strong>3</strong></article>
           <article class="stat"><span>今日出車</span><strong>2</strong></article>
           <article class="stat"><span>現場待收款</span><strong>$18,800</strong></article>
-          <article class="stat"><span>生成器核心</span><strong style="font-size:1.05rem; color:var(--gold-deep);">v1.6.79 就緒 ✓</strong></article>
+          <article class="stat"><span>生成器核心</span><strong style="font-size:1.05rem; color:var(--gold-deep);">已就緒 ✓</strong></article>
         </div>
 
         <article class="card">
@@ -1252,6 +1252,7 @@ Day 2
     // 原鄉谷包車路段學習庫 (Route Learning Database)
     // ==============================================================
     const ROUTE_CACHE_KEY = 'yxg_route_durations_cache_v1';
+    const sharedRouteStorageKey = 'yxg-confirmed-drive-times-v1';
     const defaultRouteDurations = {
       '桃園國際機場 -> 勝興車站舊山線鐵道自行車': { minutes: 80, note: '國道一號南下苗栗三義' },
       '勝興車站舊山線鐵道自行車 -> 台中逢甲商旅': { minutes: 50, note: '台13線南下接大雅交流道' },
@@ -1277,21 +1278,67 @@ Day 2
       '阿里山園區 -> 臺中逢甲商旅': { minutes: 180, note: '台18接國三轉台74' },
       '野柳地質公園 -> 桃子海岸': { minutes: 15, note: '北部濱海公路' },
       '桃子海岸 -> 十分瀑布': { minutes: 45, note: '基平橋接十分風景區' },
-      '十分老街 -> 九份老街': { minutes: 35, note: '瑞平公路轉102縣道' }
+      '十分老街 -> 九份老街': { minutes: 35, note: '瑞平公路轉102縣道' },
+      '嘉義高鐵站出發 -> 噴水火雞肉飯': { minutes: 35, note: '已確認嘉義市區接駁' },
+      '噴水火雞肉飯 -> 三隻小豬觀光農場': { minutes: 30, note: '已確認嘉義至民雄' },
+      '三隻小豬觀光農場 -> 橘子商旅': { minutes: 30, note: '已確認民雄返嘉義市' },
+      '橘子商旅 -> 林聰明沙鍋魚頭（終點站）': { minutes: 10, note: '已確認文化路市區路段' },
+      '林聰明沙鍋魚頭（終點站） -> 橘子商旅': { minutes: 10, note: '已確認文化路市區回程' },
+      '橘子商旅 -> 優遊吧斯鄒族文化部落': { minutes: 125, note: '已確認阿里山山路' },
+      '優遊吧斯鄒族文化部落 -> 達官現炒風味餐廳': { minutes: 15, note: '已確認樂野至石棹' },
+      '達官現炒風味餐廳 -> 奮起湖老街': { minutes: 25, note: '已確認石棹至奮起湖' },
+      '奮起湖老街 -> 返回嘉義橘子商旅結束行程': { minutes: 120, note: '已確認奮起湖返嘉義市' }
+    };
+
+    const readSharedRoutes = () => {
+      try {
+        const routes = JSON.parse(localStorage.getItem(sharedRouteStorageKey) || '[]');
+        return Array.isArray(routes) ? routes.filter(route => route && route.from && route.to && Number(route.mins) > 0) : [];
+      } catch (_) {
+        return [];
+      }
+    };
+
+    const mergeSharedRoutes = routes => {
+      const merged = new Map();
+      readSharedRoutes().forEach(route => merged.set(`${route.from} -> ${route.to}`, route));
+      routes.filter(route => route && route.from && route.to && Number(route.mins) > 0)
+        .forEach(route => merged.set(`${route.from} -> ${route.to}`, route));
+      const values = Array.from(merged.values());
+      try { localStorage.setItem(sharedRouteStorageKey, JSON.stringify(values)); } catch (_) {}
+      return values;
+    };
+
+    const removeSharedRoute = (from, to) => {
+      const filtered = readSharedRoutes().filter(route => !((route.from === from && route.to === to) || (route.from === to && route.to === from)));
+      try { localStorage.setItem(sharedRouteStorageKey, JSON.stringify(filtered)); } catch (_) {}
     };
 
     window.loadRouteCache = function() {
       try {
         const saved = localStorage.getItem(ROUTE_CACHE_KEY);
-        if (saved) return Object.assign({}, defaultRouteDurations, JSON.parse(saved));
+        const localCache = saved ? JSON.parse(saved) : {};
+        const sharedCache = readSharedRoutes().reduce((cache, route) => {
+          cache[`${route.from} -> ${route.to}`] = { minutes: Number(route.mins), note: route.note || '生成器共用記憶' };
+          return cache;
+        }, {});
+        return Object.assign({}, defaultRouteDurations, localCache, sharedCache);
       } catch (_) {}
-      return Object.assign({}, defaultRouteDurations);
+      return Object.assign({}, defaultRouteDurations, readSharedRoutes().reduce((cache, route) => {
+        cache[`${route.from} -> ${route.to}`] = { minutes: Number(route.mins), note: route.note || '生成器共用記憶' };
+        return cache;
+      }, {}));
     };
 
     window.saveRouteCache = function(cache) {
       try {
         localStorage.setItem(ROUTE_CACHE_KEY, JSON.stringify(cache));
       } catch (_) {}
+      const routes = Object.entries(cache).flatMap(([key, value]) => {
+        const [from, to] = key.split(' -> ');
+        return from && to && Number(value?.minutes) > 0 ? [{ from, to, mins: Number(value.minutes), note: value.note || '後台確認' }] : [];
+      });
+      mergeSharedRoutes(routes);
     };
 
     window.saveSingleRouteDuration = function(from, to, minutesInputId) {
@@ -1336,6 +1383,7 @@ Day 2
       const cache = window.loadRouteCache();
       delete cache[key1];
       delete cache[key2];
+      removeSharedRoute(from.trim(), to.trim());
       window.saveRouteCache(cache);
       window.performItineraryAuditAndRouteCheck();
       window.showToast(`🗑️ 已清除「${from} ➔ ${to}」之車程記錄，可重新輸入！`);
@@ -1351,7 +1399,7 @@ Day 2
       let dropoff = null;
 
       // 檢查是否含有接機特徵
-      const hasPickupSignal = /接機|抵達|航班|班機|降落|抵達航廈|航廈/i.test(text);
+      const hasPickupSignal = window.YxgFlexibleItinerary?.hasAirportPickup(text) || false;
       if (hasPickupSignal) {
         let flight = '';
         let time = '';
@@ -1364,7 +1412,7 @@ Day 2
                        text.match(/\b([A-Z]{2}\s*\d{3,4})\b/);
         if (fMatch) flight = fMatch[1].replace(/\s+/g, '').toUpperCase();
 
-        const tMatch = text.match(/(?:抵達時間|降落時間|時間)[：:\s]*(\d{1,2}[:：]\d{2})/i) ||
+        const tMatch = text.match(/(?:抵達時間|降落時間|航班抵達)[：:\s]*(\d{1,2}[:：]\d{2})/i) ||
                        text.match(/(?:接機[^\n]*?)(\d{1,2}[:：]\d{2})/i) ||
                        text.match(/\b(\d{1,2}[:：]\d{2})\s*(?:抵達|降落|到)/i);
         if (tMatch) time = tMatch[1].replace('：', ':');
@@ -1902,6 +1950,8 @@ ${queryList}`;
      * 100% 忠實還原使用者輸入之出發起點與住宿飯店，絕不隨意預設或覆寫為「台北各大飯店」
      */
     window.parseRawTextLocally = function(rawText) {
+      const normalized = window.YxgFlexibleItinerary?.normalize(rawText) || rawText;
+      if (normalized !== rawText) return normalized;
       if (!/^\s*(?:Day\s*\d+|第[一二三四五六七八九十\d]+天)(?:\s|$)/im.test(rawText)) return null;
       const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
       const currentYear = new Date().getFullYear();
@@ -1910,10 +1960,10 @@ ${queryList}`;
       let startDateStr = '';
       let endDateStr = '';
 
-      const sMatch = rawText.match(/包車開始日期[：:]\s*([0-9\/\-]+)/i) || rawText.match(/抵達日期[：:]\s*([0-9\/\-]+)/i);
+      const sMatch = rawText.match(/包車開始(?:日期)?[：:]\s*([0-9\/\-]+)/i) || rawText.match(/抵達日期[：:]\s*([0-9\/\-]+)/i);
       if (sMatch) startDateStr = sMatch[1].replace(/-/g, '/');
 
-      const eMatch = rawText.match(/包車結束日期[：:]\s*([0-9\/\-]+)/i) || rawText.match(/送機日期[：:]\s*([0-9\/\-]+)/i);
+      const eMatch = rawText.match(/包車結束(?:日期)?[：:]\s*([0-9\/\-]+)/i) || rawText.match(/送機日期[：:]\s*([0-9\/\-]+)/i);
       if (eMatch) endDateStr = eMatch[1].replace(/-/g, '/');
 
       if (!startDateStr || !endDateStr) {
@@ -2010,12 +2060,13 @@ ${queryList}`;
           // 若有具體飯店（如嘉義樂客商旅），絕不可被模糊的台北各大飯店蓋過
           if (val && (val !== '台北各大飯店' || !sec.hotel)) {
             sec.hotel = val;
+            sec.spots.push(`住宿飯店：${val}`);
           }
           return;
         }
 
         // 偵測今日車資
-        const fareMatch = line.match(/(?:今日車資|當日車資|車資)[：:]\s*([0-9,]+)/i);
+        const fareMatch = line.match(/(?:今日車資|當日車資|單日車資|車資)[：:]\s*(?:NT\s*\$|\$)?\s*([0-9,]+)/i);
         if (fareMatch) {
           const f = parseInt(fareMatch[1].replace(/[^\d]/g, ''), 10) || 0;
           if (f > 0) sec.fare = f;
@@ -2023,7 +2074,7 @@ ${queryList}`;
         }
 
         // 排除掉不屬於景點的非行程行
-        if (!/包車|預約代表|聯絡電話|接機|送機|航班|抵達|起飛|航廈|---|=|——|出發起點|出發地點|住宿飯店|今日車資/.test(line)) {
+        if (!/包車|預約代表|聯絡電話|接機|送機|航班|抵達|起飛|航廈|---|=|——|出發起點|出發地點|今日車資|每日行程規劃/.test(line)) {
           let cleanedSpot = line.replace(/^[0-9\.\-\*、\s]+/, '').replace(/^行程內容[：:]\s*/i, '').trim();
           if (cleanedSpot && !cleanedSpot.includes('：')) {
             sec.spots.push(spotTypoCorrections[cleanedSpot] || cleanedSpot);
@@ -2080,7 +2131,9 @@ ${queryList}`;
           });
         }
         if (sec.bookingTime) output += `勝興預約時間：${sec.bookingTime}\n`;
-        output += `住宿飯店：${finalHotel}\n`;
+        if (!spotsList.some(sp => sp.startsWith('住宿飯店：')) && !spotsList.some(sp => /終點|結束行程/.test(sp))) {
+          output += `住宿飯店：${finalHotel}\n`;
+        }
         output += `今日車資：${finalFare}\n\n`;
       });
 
@@ -2113,12 +2166,15 @@ ${queryList}`;
       }
 
       const rawText = textarea.value.trim();
+      const normalizedSource = window.YxgFlexibleItinerary?.normalize(rawText) || rawText;
       let apiKey = localStorage.getItem('yxg_gemini_api_key');
-      window.showToast('🧠 正在啟動雙核智慧引擎分析文字與在地路線，請稍候...');
+      window.showToast('🧠 正在整理文字與在地路線，請稍候...');
 
-      let formattedResult = null;
+      const isStructuredDailyItinerary = /^\s*Day\s*\d+\s*[：:]?[ \t]*$/im.test(rawText) && /^\s*今日車資[：:]/m.test(rawText);
+      let formattedResult = normalizedSource !== rawText ? normalizedSource :
+        (isStructuredDailyItinerary ? window.parseRawTextLocally(rawText) : null);
 
-      if (apiKey && apiKey.trim()) {
+      if (!formattedResult && apiKey && apiKey.trim()) {
         const currentYear = new Date().getFullYear();
         const systemInstruction = `你是一位專業的台灣包車旅遊（原鄉谷包車旅遊）調度專員。
 將客人發送的文字，標準化重組成系統專用的標準文字行程格式：
@@ -2183,7 +2239,7 @@ Day 1
       if (formattedResult) {
         formattedResult = formattedResult.replace(/^```[a-zA-Z]*\n?/, '').replace(/\n?```$/, '').trim();
         formattedResult = window.cleanStandardItineraryText(formattedResult);
-        const review = window.YxgIntake.reviewConversion(rawText, formattedResult);
+        const review = window.YxgIntake.reviewConversion(normalizedSource, formattedResult);
         if (!review.ok) {
           const message = `整理結果未通過檢查：${review.issues.join('、')}。原始文字已保留，請人工核對。`;
           const status = document.getElementById('simple-intake-status');
@@ -2192,6 +2248,12 @@ Day 1
           return;
         }
         textarea.value = review.text;
+        const suppliedCaseId = window.YxgFlexibleItinerary?.confirmationId(rawText);
+        const caseInput = document.getElementById('dispatch-finance-case-id');
+        if (suppliedCaseId && caseInput && !caseInput.value.trim()) {
+          caseInput.value = suppliedCaseId;
+          window.updateOutputPreview?.(suppliedCaseId);
+        }
 
         window.renderIndependentPreorderUI();
         window.recalculateLiveSummary();
@@ -2507,11 +2569,7 @@ Day 1
       let text = textarea ? textarea.value.trim() : '';
       text = window.cleanStandardItineraryText(text);
 
-      const carMatches = text.matchAll(/(?:今日車資|車資)[：:]\s*([0-9,]+)/g);
-      let calculatedTotalFare = 0;
-      for (const cm of carMatches) {
-        calculatedTotalFare += parseInt(cm[1].replace(/[^\d]/g, ''), 10) || 0;
-      }
+      const calculatedTotalFare = window.YxgFlexibleItinerary.sumDailyFares(text);
       if (calculatedTotalFare > 0 && !/總車資[：:]/.test(text)) {
         text = `總車資：${calculatedTotalFare}\n${text}`;
       }
@@ -3076,11 +3134,7 @@ Day 1
       if (!textarea) return;
       const text = textarea.value;
 
-      const matches = text.matchAll(/(?:今日車資|車資)[：:]\s*([0-9,]+)/g);
-      let totalCarFare = 0;
-      for (const m of matches) {
-        totalCarFare += parseInt(m[1].replace(/[^\d]/g, ''), 10) || 0;
-      }
+      const totalCarFare = window.YxgFlexibleItinerary.sumDailyFares(text);
 
       let totalTickets = 0;
       let ticketItemsText = [];
@@ -3268,7 +3322,7 @@ Day 1
 </script>
 <script>
 (() => {
-  const CANONICAL_GENERATOR_FILE = '原鄉谷包車旅遊_行程生成器.html';
+  const CANONICAL_GENERATOR_FILE = '原鄉谷包車旅遊_行程生成器_客戶停留同步版.html';
   window.openSelectedGenerator = function() {
     const review = window.YxgIntake.reviewStandard(document.getElementById('standard-text-workspace')?.value || '');
     if (!review.ok) {
@@ -3316,7 +3370,14 @@ Day 1
       return from && to && Number(value?.minutes) > 0 ? [{ from, to, mins: Number(value.minutes), label: `車程約 ${value.minutes} 分鐘` }] : [];
     });
     try {
-      window.YxgCaseStore?.saveCase({ id: caseId, standardText: text, routes, driver: null, status: 'ready-for-generator' });
+      window.YxgCaseStore?.saveCase({
+        id: caseId,
+        standardText: text,
+        routes,
+        places: window.loadPlacesData?.() || [],
+        driver: null,
+        status: 'ready-for-generator'
+      });
       localStorage.setItem('yxg-text-workspace-draft-v1', text);
       sessionStorage.setItem('yxg-text-workspace-draft-v1', text);
     } catch (error) {
@@ -3420,13 +3481,13 @@ window.YxgIntake = (() => {
     let text = candidate;
     if (!issues.length) {
       const sourceFareByDay = new Map();
-      source.split(/(?=^Day\s+\d+\s*$)/gmi).forEach(block => {
-        const day = block.match(/^Day\s+(\d+)\s*$/mi)?.[1];
-        const fare = block.match(/^今日車資[：:]\s*([\d,]+)/m)?.[1];
+      source.split(/(?=^Day\s+\d+\s*[：:]?\s*$)/gmi).forEach(block => {
+        const day = block.match(/^Day\s+(\d+)\s*[：:]?\s*$/mi)?.[1];
+        const fare = block.match(/^今日車資[：:]\s*(?:NT\s*\$|\$)?\s*([\d,]+)/mi)?.[1];
         if (day && fare) sourceFareByDay.set(Number(day), Number(fare.replace(/,/g, '')));
       });
       let candidateDay = 0;
-      text = candidate.replace(/^Day\s+(\d+)\s*$|^今日車資[：:]\s*[\d,]+\s*$/gmi, line => {
+      text = candidate.replace(/^Day[ \t]+(\d+)[ \t]*$|^今日車資[：:][^\r\n]*$/gmi, line => {
         const day = line.match(/^Day\s+(\d+)/i)?.[1];
         if (day) { candidateDay = Number(day); return line; }
         const given = sourceFareByDay.get(candidateDay);
@@ -3470,16 +3531,16 @@ window.YxgIntake = (() => {
         <h2 style="margin:8px 0; color:var(--ink-black);">貼上行程，系統自動完成其餘工作</h2>
         <p style="margin:0; color:var(--ink-sub);">系統會檢查資料、加總車資；如需代訂，勾選後再建立案件並開啟生成器。</p>
       </div>
-      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px;">
+      <div id="simple-intake-steps" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:18px;">
         <div style="padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border-gilded);"><b style="color:var(--gold-deep);">1｜貼上行程</b><span style="display:block;font-size:.78rem;color:var(--ink-sub);margin-top:4px;">貼入客人提供的行程資料</span></div>
         <div style="padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border-gilded);"><b style="color:var(--gold-deep);">2｜自動檢查／補齊</b><span style="display:block;font-size:.78rem;color:var(--ink-sub);margin-top:4px;">核對日期、每日車資與行程資料</span></div>
         <div style="padding:12px;border-radius:10px;background:#fff;border:1px solid var(--border-gilded);"><b style="color:var(--gold-deep);">3｜確認代訂並開啟</b><span style="display:block;font-size:.78rem;color:var(--ink-sub);margin-top:4px;">勾選需要的項目後建立案件</span></div>
       </div>
+      <div id="simple-intake-input-slot" style="margin-bottom:16px;"></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;">
         <button type="button" class="button primary small" onclick="window.convertRawTextToStandardWithGemini()">✨ 整理客人自由文字</button>
         <button type="button" class="button small" onclick="window.configureGeminiKeyPrompt()">🔑 設定整理功能</button>
       </div>
-      <div id="simple-intake-input-slot"></div>
       <p id="simple-intake-status" aria-live="polite" style="margin:10px 0 0;padding:10px 12px;border-radius:8px;background:#fff;color:var(--ink-sub);font-size:.84rem;">請直接貼上行程資料；系統會自動檢查並列出可代訂項目。</p>
       <div id="simple-intake-review-slot" style="display:grid;gap:10px;margin:16px 0;"></div>
       <div id="simple-intake-pricing-slot"></div>
@@ -3591,6 +3652,13 @@ window.YxgIntake = (() => {
       event.preventDefault();
       textarea.value = pastedText.trim();
       status.textContent = '正在自動檢查行程資料與可代訂項目…';
+      if (/^\s*Day\s*\d+\s*[：:]?[ \t]*$/im.test(pastedText) && /^\s*今日車資[：:]/m.test(pastedText) && !/^\s*包車開始日期[：:]/m.test(pastedText)) {
+        window.convertRawTextToStandardWithGemini().then(() => {
+          refreshRail();
+          updateIntakeStatus();
+        });
+        return;
+      }
       window.handleWorkspaceInputChanged?.();
       window.performItineraryAuditAndRouteCheck?.();
       window.renderIndependentPreorderUI?.();
@@ -3605,6 +3673,175 @@ window.YxgIntake = (() => {
   };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bootSimpleHome);
   else bootSimpleHome();
+})();
+</script>
+<script>
+/* yxg-flexible-itinerary-v1 */
+window.YxgFlexibleItinerary = (() => {
+  const hasAirportPickup = text => /接機資訊|接機地點|迎賓接機|抵達航班|抵達時間|航班抵達|降落時間|機場.{0,8}接機|接機.{0,8}機場/i.test(String(text || ''));
+  const confirmationId = text => String(text || '').match(/確認單編號\s*[：:]\s*([A-Za-z0-9_-]+)/)?.[1] || '';
+  const sumDailyFares = text => [...String(text || '').matchAll(/^(?:今日車資|單日車資|車資)\s*[：:]\s*(?:NT\$|\$)?\s*([\d,]+)/gm)]
+    .reduce((sum, match) => sum + Number(match[1].replace(/,/g, '')), 0);
+  const dateOf = text => {
+    const m = String(text || '').match(/(20\d{2})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日/);
+    if (!m) return '';
+    const date = new Date(Date.UTC(+m[1], +m[2] - 1, +m[3]));
+    if (date.getUTCFullYear() !== +m[1] || date.getUTCMonth() !== +m[2] - 1 || date.getUTCDate() !== +m[3]) return '';
+    return `${m[1]}/${m[2].padStart(2, '0')}/${m[3].padStart(2, '0')}`;
+  };
+  const departureClock = value => {
+    const m = String(value || '').match(/(\d{1,2})(?::(\d{2})|點(\d{1,2})?分?)/);
+    if (!m) return '待確認';
+    let hour = +m[1];
+    if (/下午/.test(value) && hour < 12) hour += 12;
+    if (/上午/.test(value) && hour === 12) hour = 0;
+    const minute = +(m[2] || m[3] || 0);
+    return hour < 24 && minute < 60 ? `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}` : '待確認';
+  };
+  const normalize = input => {
+    const source = String(input || '').replace(/\r\n/g, '\n').replace(/&#x20;|\u00a0/g, ' ').replace(/\\\s*\n/g, '\n').trim();
+    const labeled = [...source.matchAll(/^\s*Day\s*(\d+)\s*[：:]\s*(20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日)[^\n]*/gim)]
+      .map(m => ({ number: +m[1], date: dateOf(m[2]), from: m.index, after: m.index + m[0].length }));
+    const dated = [...source.matchAll(/20\d{2}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日\s*(?:[（(]?星期[一二三四五六日天][）)]?)?/g)]
+      .map((m, i) => ({ number: i + 1, date: dateOf(m[0]), from: m.index, after: m.index + m[0].length }));
+    const headers = labeled.length ? labeled : dated;
+    if (!headers.length || headers.some((h, i) => !h.date || h.number !== i + 1)) return source;
+    const meta = source.slice(0, headers[0].from);
+    const name = meta.match(/(?:客人資料姓名|預約代表|姓名)\s*[：:]\s*([^\s：:]+)/)?.[1] || '貴賓';
+    const adults = +(meta.match(/(\d+)\s*位?大人/)?.[1] || 0);
+    const children = +(meta.match(/(\d+)\s*(?:位?小孩|位?兒童)/)?.[1] || 0);
+    const count = adults + children;
+    const phone = (meta.match(/(?:聯絡電話|電話)\s*[：:]\s*([+\d][+\d\s-]{7,})/)?.[1] || '').trim();
+    const days = headers.map((head, i) => {
+      const body = source.slice(head.after, headers[i + 1]?.from ?? source.length).trim();
+      const combined = body.match(/出發時間\s*\/\s*地點\s*[：:]\s*([\s\S]*?)(?=\s+行程\s*[：:]|$)/)?.[1]?.trim() || '';
+      const timeText = body.match(/(?:^|\n)\s*出發時間\s*[：:]\s*([^\n]+)/)?.[1] || combined;
+      const origin = body.match(/(?:^|\n)\s*出發地點\s*[：:]\s*([^\n]+)/)?.[1]?.trim() ||
+        combined.replace(/^\s*(?:上午|下午)?[、,\s]*\d{1,2}(?:[:：]\d{2}|點(?:\d{1,2}分?)?)\s*出發\s*/, '').trim();
+      const stay = body.match(/(?:^|\n)\s*住宿飯店\s*[：:]\s*([^\n]+)/)?.[1]?.trim() || '待確認飯店';
+      const fare = +(body.match(/(?:單日車資|今日車資|車資)\s*[：:]\s*(?:NT\$|\$)?\s*([\d,]+)/)?.[1] || '').replace(/,/g, '');
+      const compactRoute = body.match(/(?:^|\s)行程\s*[：:]\s*([\s\S]*?)(?=\s+(?:單日車資|今日車資|車資)\s*[：:]|$)/)?.[1];
+      const entries = compactRoute
+        ? compactRoute.split(/[～→➔]/).map(v => v.trim()).filter(v => v && !/^(?:.+出發|飯店放行李|嘉義住宿)$/.test(v))
+        : body.split('\n').map(v => v.trim()).filter(v => v && !/^(?:出發時間|出發地點|單日車資|今日車資|車資|住宿飯店|行程路線)\s*[：:]/.test(v))
+          .map(v => v.replace(/^(?:景點|午餐|晚餐)\s*[：:]\s*/, '').trim()).filter(Boolean);
+      return { date: head.date, origin, time: departureClock(timeText), stay, fare, entries };
+    });
+    const total = days.reduce((sum, day) => sum + (day.fare || 0), 0);
+    const lines = [
+      `包車開始日期：${days[0].date}`, `包車結束日期：${days[days.length - 1].date}`,
+      `預約代表：${name}${count ? ` 等共 ${count} 人` : ''}`, `聯絡電話：${phone}`
+    ];
+    if (total && days.every(day => day.fare)) lines.unshift(`總車資：${total}`);
+    days.forEach((day, i) => lines.push('', `Day ${i + 1}`, `出發地點：${day.origin || (i ? days[i - 1].stay : '待確認出發點')}`, `出發時間：${day.time}`, '行程內容：', ...(day.entries.length ? day.entries : ['行程待補']), `住宿飯店：${day.stay}`, `今日車資：${day.fare || '待補'}`));
+    return lines.join('\n').trim();
+  };
+  return { hasAirportPickup, confirmationId, sumDailyFares, normalize };
+})();
+</script>
+<script>
+/* yxg-confirm-new-places-before-saving */
+(() => {
+  const compactName = value => {
+    const name = String(value || '').replace(/[（(][^）)]*[）)]/g, '').replace(/[^\p{L}\p{N}]/gu, '').toLowerCase();
+    if (/優遊吧斯|優游吧斯|yuyupas/.test(name)) return '優遊吧斯鄒族文化部落';
+    if (/勝興/.test(name) && /鐵道自行車|鐵路自行車|腳踏火車/.test(name)) return '勝興鐵道自行車';
+    return name;
+  };
+  const isKnown = (name, places) => {
+    const candidate = compactName(name);
+    return places.some(place => {
+      const saved = compactName(place.name);
+      return saved === candidate || (candidate.length >= 4 && saved.includes(candidate)) || (saved.length >= 4 && candidate.includes(saved));
+    });
+  };
+  const extractUnlistedPlaces = text => {
+    const places = window.loadPlacesData?.() || [];
+    const found = new Map();
+    let inDay = false;
+    for (const raw of String(text || '').split(/\r?\n/)) {
+      let line = raw.trim();
+      if (/^Day\s*\d+\b/i.test(line)) { inDay = true; continue; }
+      if (!inDay || !line || /^行程(?:內容|路線|規劃)\s*[：:]?\s*$/.test(line)) continue;
+      if (/^\d{4}[/-]\d{1,2}[/-]\d{1,2}|^\d{4}\s*年\s*\d{1,2}\s*月\s*\d{1,2}\s*日/.test(line)) continue;
+      if (/^(?:午餐|晚餐|早餐|點心|住宿飯店|當晚住宿|飯店|酒店|出發時間|出發地點|出發起點|今日車資|單日車資|車資|預約時間|勝興預約時間|代訂|接機|送機|備註|自由活動|已收|行程結束點)\s*[：:]/.test(line)) continue;
+      line = line.replace(/^(?:景點|參觀|遊覽)\s*[：:]\s*/, '').trim();
+      if (!line || line.length > 42 || /[→➔]|車程約|待確認|待補|結束行程|終點站|迎賓|接駕|出發|返回|送機|接機|入住|放行李|自由活動|機場|高鐵站/.test(line)) continue;
+      if (/餐廳|現炒|火雞肉飯|雞肉飯|魚頭|便當|小吃|美食|火鍋|咖啡|茶館|酒店|飯店|商旅|旅館|民宿|旅店|溫泉會館|hotel/i.test(line)) continue;
+      const key = compactName(line);
+      if (key && !found.has(key) && !isKnown(line, places)) found.set(key, line);
+    }
+    return [...found.values()];
+  };
+  const boot = () => {
+    const reviewSlot = document.getElementById('simple-intake-review-slot');
+    const textarea = document.getElementById('standard-text-workspace');
+    if (!reviewSlot || !textarea || !window.loadPlacesData || !window.savePlacesData) return;
+    const panel = document.createElement('article');
+    panel.id = 'pending-places-review';
+    panel.className = 'card';
+    panel.style.cssText = 'border:1px solid var(--border-gilded);background:#fff;padding:16px;';
+    panel.hidden = true;
+    panel.innerHTML = '<h4 style="margin:0 0 6px;color:var(--gold-deep);font-size:.92rem;">📍 未收錄景點確認</h4><p style="margin:0 0 10px;color:var(--ink-sub);font-size:.78rem;">僅勾選確定要保存的景點；未勾選的不會加入資料庫。餐廳、飯店與行程終點不會自動列入。</p><div id="pending-places-list" style="display:grid;gap:7px;"></div><button id="save-selected-places" type="button" class="button small primary" style="margin-top:12px;">💾 加入所選景點至資料庫</button>';
+    reviewSlot.appendChild(panel);
+    const listBox = panel.querySelector('#pending-places-list');
+    const render = () => {
+      const checkedBefore = new Set([...listBox.querySelectorAll('input:checked')].map(input => input.value));
+      const candidates = extractUnlistedPlaces(textarea.value);
+      listBox.replaceChildren();
+      panel.hidden = candidates.length === 0;
+      for (const name of candidates) {
+        const label = document.createElement('label');
+        label.style.cssText = 'display:flex;align-items:center;gap:8px;padding:7px 9px;border:1px solid var(--border-gilded);border-radius:7px;font-size:.82rem;cursor:pointer;';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = name;
+        input.checked = checkedBefore.has(name);
+        const text = document.createElement('span');
+        text.textContent = name;
+        label.append(input, text);
+        listBox.appendChild(label);
+      }
+    };
+    panel.querySelector('#save-selected-places').addEventListener('click', () => {
+      const selected = [...listBox.querySelectorAll('input:checked')].map(input => input.value);
+      if (!selected.length) return window.showToast?.('請先勾選要加入資料庫的景點。', true);
+      const places = window.loadPlacesData();
+      let added = 0;
+      for (const name of selected) {
+        if (isKnown(name, places)) continue;
+        places.unshift({ id: `custom_${Date.now()}_${added}`, name, region: '待分類', stayMinutes: 60, description: '', notice: '' });
+        added++;
+      }
+      if (!added) return render();
+      window.savePlacesData(places);
+      if (selected.some(name => !isKnown(name, window.loadPlacesData()))) return window.showToast?.('景點資料未能儲存，請檢查瀏覽器儲存權限。', true);
+      window.renderPlacesListUI?.();
+      render();
+      window.showToast?.(`已將 ${added} 個景點加入資料庫；可至「景點資料庫」補充介紹與停留時間。`);
+    });
+    const previousInputChanged = window.handleWorkspaceInputChanged;
+    window.handleWorkspaceInputChanged = function(...args) {
+      const result = previousInputChanged?.apply(this, args);
+      render();
+      return result;
+    };
+    const previousConvert = window.convertRawTextToStandardWithGemini;
+    window.convertRawTextToStandardWithGemini = async function(...args) {
+      const result = await previousConvert?.apply(this, args);
+      render();
+      return result;
+    };
+    const previousClear = window.clearWorkspaceInput;
+    window.clearWorkspaceInput = function(...args) {
+      const result = previousClear?.apply(this, args);
+      render();
+      return result;
+    };
+    render();
+  };
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', boot);
+  else boot();
 })();
 </script>
 </body>
